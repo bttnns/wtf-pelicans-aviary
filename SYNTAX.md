@@ -10,13 +10,18 @@ fails the build.
 
 ```yaml
 ---
-slug: "/learn/your-lesson"   # route + canonical (must match the site's LESSONS)
+slug: "/learn/your-lesson"   # the lesson's canonical id (matches the site's LESSONS)
 nav: "your lesson"            # short label for the prev/next nav + hub spine
 blurb: "one-line course-catalog description."
 teaches: "comma, separated, schema.org topics"
 order: 99                     # 1-based position in the curriculum
 ---
 ```
+
+The `slug` is the lesson's canonical identifier. The page a visitor actually
+reads lives at `/pelicanplus/<name>` (e.g. `/pelicanplus/token`); that is the
+form you use when you link to another lesson from a lesson body (see the link
+policy below).
 
 ## The directive vocabulary (the only rich content)
 
@@ -50,6 +55,8 @@ References a drawing by id. The id must match `^[a-z0-9][a-z0-9-]*$` AND already
 exist in the site's `illustrations.json` (the build fails otherwise). The main
 lesson art is usually the slug stem (`token`); extras append a number
 (`token-2`, `token-3`). The model, prompt, and credit are filled in automatically.
+New art is generated in the main repo, so ask a maintainer if you need a drawing
+for a brand-new lesson.
 
 ```markdown
 ::art{id="token-2" caption="the word 'pelican' sliced into numbered chunks"}
@@ -83,7 +90,7 @@ External `https` links belong here and nowhere else. They render with
 
 | where | allowed |
 | --- | --- |
-| body prose | relative (`/learn/token`), `#anchors`, `pelicans.wtf`, `mailto:` |
+| body prose | relative (`/pelicanplus/token`), `#anchors`, `pelicans.wtf`, `mailto:` |
 | `:::sources` only | external `https://...` |
 | anywhere | NO `http:`, NO `javascript:`, NO `data:` |
 
