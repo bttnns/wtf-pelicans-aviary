@@ -1,0 +1,221 @@
+---
+slug: "/learn/open-vs-closed"
+nav: "open vs closed"
+blurb: "rented birds vs birds you own outright. the great weights schism."
+teaches: "open weights, closed weights, open source models"
+order: 11
+---
+import LessonArt from "../../../components/LessonArt.astro";
+import DrBeakman from "../../../components/DrBeakman.astro";
+
+
+  <div
+    class="mt-4 text-left text-[15px] leading-relaxed text-gray-800"
+    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+  >
+    <p>
+      Last lesson left you a choice: point your agent at a rented bird or one you
+      own. Here is that fork. Two kinds of AI models. <b>Closed / proprietary</b>:
+      the lab keeps the math file on their servers and sells you access through a
+      slot in the wall. You are renting a bird you never see. <b>Open weights</b>:
+      the lab published the parameters file (those dials from lesson two). You
+      download it, run it locally, fine-tune it, redistribute it. You own the
+      bird. Same species, different custody arrangement: landlord situation
+      versus pet situation.
+    </p>
+
+    <DrBeakman>
+      sit DOWN. open vs closed is not vibes, it is CUSTODY. *burp* open-weights
+      means the numbers file is on your drive forever; closed means you rent a
+      slot in a wall and they can swap the bird behind it.
+    </DrBeakman>
+
+    <LessonArt
+      id="open-vs-closed"
+      caption="two pelicans: one behind a thick glass window with an API slot, one perched on a laptop, free"
+    />
+
+    <LessonArt
+      id="open-vs-closed-2"
+      caption="the OS analogy: glossy proprietary towers on one side, a scrappy penguin flock on the other"
+    />
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">the OS analogy holds up</h2>
+    <p>
+      Karpathy pointed out that the AI ecosystem looks like operating systems: a
+      few dominant proprietary platforms (GPT, Claude, Gemini = Windows and
+      macOS) and a scrappy, capable open alternative (Llama / DeepSeek / Mistral
+      / Qwen = Linux). In 2026, the gap has narrowed to a provocation. DeepSeek
+      V4 Pro is MIT-licensed, 1.6 trillion total parameters, 1-million-token
+      context window, <b>80.6% on SWE-Bench Verified</b>, matching the closed
+      coding frontier. The penguins are not knocking on the door. The penguins
+      are inside the house.
+    </p>
+    <p class="mt-3">
+      This is partly a fight over philosophy, not just price. The open side has
+      a loud champion in <b>Yann LeCun</b>, Meta&rsquo;s chief AI scientist and
+      one of the trio (with <b>Geoffrey Hinton</b> and <b>Yoshua Bengio</b>)
+      whose 1980s-2000s work on neural networks earned them the Turing Award and
+      seeded everything on this site. LeCun&rsquo;s argument is blunt: a
+      technology this consequential should be a public utility, auditable and
+      forkable, not a few black boxes rented through a slot in the wall. Meta
+      released the Llama weights on exactly that bet. Whether you buy the
+      philosophy or not, it is why there is a Linux column at all.
+    </p>
+
+    <DrBeakman compact img="dr-beakman-2">
+      DeepSeek V4 Pro is MIT-licensed and hits 80.6% on SWE-Bench. the penguins
+      are not at the door, your little meat-brain. they are in the house.
+    </DrBeakman>
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">what closed gets you</h2>
+    <p>
+      The closed models (GPT-5 family, Claude 4 Opus, Gemini 3 Pro) lead on
+      convenience: one API key, frontier model, minutes to integration. The labs
+      handle updates, alignment, and the catastrophic electricity bills. On the
+      hardest benchmarks, closed still generally edges ahead, though the gap
+      shrinks every quarter. The downside is the landlord thing: data travels to
+      their server, terms can change overnight, a model can be deprecated with 30
+      days notice, and the price can go up. When the landlord raises the rent,
+      your flock is grounded. SQUAWK.
+    </p>
+
+    <LessonArt
+      id="open-vs-closed-3"
+      caption="the landlord move: the rented bird vanishes behind its slot with a 30-day deprecation notice"
+    />
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">what open weights gets you</h2>
+    <p>
+      Open weights means the <i>actual parameters file.</i> You run it on your
+      own hardware; nothing leaves your infrastructure. In regulated industries
+      (healthcare, finance, defense) where "we sent your data to a US tech
+      company" is a compliance blocker, self-hosting is often the only legal path.
+      Cost math: <b>60 to 80% cheaper</b> than frontier API prices at scale. The
+      trade-off: you now own the GPU problem. Small flock? Renting is fine. A
+      million users a day? The economics of ownership get interesting fast.
+    </p>
+
+    <DrBeakman compact img="dr-beakman-3" tag="DR. BEAKMAN, UNIMPRESSED">
+      small flock? rent, it is fine. a million users a day? owning the weights is
+      60 to 80% cheaper, you just inherit the GPU problem.
+    </DrBeakman>
+
+    <LessonArt
+      id="open-vs-closed-4"
+      caption="own the bird: the parameters file perched safe on your own drive, nobody can swap it"
+    />
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">the 2026 open-weights roster</h2>
+    <p>
+      The current frontrunners:
+    </p>
+    <ul class="ml-5 mt-2 list-disc space-y-1">
+      <li>
+        <b>Llama 4 Scout</b> (Meta): 109B total parameters, 17B active per
+        token (Mixture of Experts), 10-million-token context window, natively
+        multimodal. Runs on a single H100 or a 128 GB Mac.
+      </li>
+      <li>
+        <b>DeepSeek V4 Pro</b> (MIT license): 1.6 trillion total parameters,
+        49B active per token, 1-million-token context. Scores 80.6% on
+        SWE-Bench Verified. The model that made a lot of lab executives nervous.
+      </li>
+      <li>
+        <b>Qwen3-235B-A22B</b> (Alibaba, Apache 2.0): 235B total, 22B active.
+        Top-performing open-weight generalist as of early 2026. Strong
+        reasoning, math, and coding.
+      </li>
+      <li>
+        <b>Mistral Large 3</b> (Apache 2.0): 675B total, 41B active, December
+        2025. The European compliance pick: strong multilingual performance,
+        256K context, vision support.
+      </li>
+      <li>
+        <b>Kimi K2.6</b> (Moonshot AI, Modified MIT): 1T parameter MoE, 32B
+        active.{" "}
+        <b>Number 4 in the Artificial Analysis Intelligence Index</b>, behind
+        only Anthropic, Google, and OpenAI flagships. Number 1 among all
+        open-weight models. The open side has never been this close to the
+        frontier.
+      </li>
+    </ul>
+
+    <DrBeakman img="dr-beakman-4">
+      a closed bird can vanish under you mid-sentence with a deprecation notice.
+      a file on your drive cannot. that gap is the whole fight, and, ugh, it
+      actually matters.
+    </DrBeakman>
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">want to actually run the bird yourself?</h2>
+    <p>
+      <a href="/pelicanplus/local" class="text-blue-700 underline">
+        Head to &ldquo;run it local&rdquo;
+      </a>{" "}
+      for the practical guide: which models run on consumer hardware, which tools
+      make it painless, and why running a pelican in your own nest is genuinely
+      achievable in 2026. SQUAWK.
+    </p>
+
+    <p class="mt-6 border-t border-dashed border-purple-300 pt-3 text-sm text-gray-600">
+      <b>📚 sources &amp; further reading</b> (the birds cite their sources):
+      <ul class="list-disc space-y-1 break-words pl-6 text-sm">
+        <li>
+          Andrej Karpathy,{" "}
+          <a
+            href="https://www.youtube.com/watch?v=zjkBMFhNj_g"
+            target="_blank"
+            rel="noreferrer"
+            class="text-blue-700 underline"
+          >
+            &ldquo;[1hr Talk] Intro to Large Language Models&rdquo;
+          </a>{" "}
+          covers the open-vs-closed landscape, the two-files argument, and the OS analogy
+        </li>
+        <li>
+          <a
+            href="https://arxiv.org/abs/2307.09288"
+            target="_blank"
+            rel="noreferrer"
+            class="text-blue-700 underline"
+          >
+            Touvron et al., &ldquo;Llama 2: Open Foundation and Fine-Tuned Chat Models&rdquo; (arXiv 2307.09288)
+          </a>{" "}
+          the paper that put open weights on the map (Yann LeCun&apos;s Meta AI team)
+        </li>
+        <li>
+          <a
+            href="https://opensource.org/ai/open-source-ai-definition"
+            target="_blank"
+            rel="noreferrer"
+            class="text-blue-700 underline"
+          >
+            Open Source Initiative, &ldquo;The Open Source AI Definition 1.0&rdquo;
+          </a>{" "}
+          official definition of what &ldquo;open source AI&rdquo; actually means
+        </li>
+        <li>
+          <a
+            href="https://arxiv.org/abs/2108.07258"
+            target="_blank"
+            rel="noreferrer"
+            class="text-blue-700 underline"
+          >
+            Bommasani et al., &ldquo;On the Opportunities and Risks of Foundation Models&rdquo; (arXiv 2108.07258)
+          </a>{" "}
+          Stanford CRFM report coining and scoping the term
+        </li>
+        <li>
+          <a
+            href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro"
+            target="_blank"
+            rel="noreferrer"
+            class="text-blue-700 underline"
+          >
+            deepseek-ai/DeepSeek-V4-Pro model card (Hugging Face)
+          </a>{" "}
+          MIT-licensed, 1.6T MoE, 80.6% SWE-Bench, the open-weights bird making labs nervous
+        </li>
+      </ul>
+    </p>
+  </div>

@@ -1,0 +1,393 @@
+---
+slug: "/prompt"
+nav: "prompting"
+blurb: "how to actually ask. context engineering, prompt engineering, temperature."
+teaches: "prompt engineering, context engineering, temperature, sampling"
+order: 8
+---
+import LessonArt from "../../../components/LessonArt.astro";
+import DrBeakman from "../../../components/DrBeakman.astro";
+import { PromptCopy } from "../../../islands/Notepad";
+import { PROMPTS as BENCH_PROMPTS, DESCRIBE_PROMPT, POUCH_PROMPT, TIP_SCREEN_PROMPT } from "../../../data";
+
+const benchWindows = Object.entries(BENCH_PROMPTS).map(([version, text], i) => ({
+  file: `benchmark_${version.replace(/-/g, "_")}.txt`,
+  label: `the benchmark prompt (${version}): sent verbatim, sole user message, no system prompt, no sampling params`,
+  text,
+  link: i === 0 ? { href: "/", text: "see all 30+ victims »" } : null,
+}));
+
+const PROMPTS = [
+  ...benchWindows,
+  {
+    file: "artists_statement.txt",
+    label: "the artist's-statement prompt: second (vision) call, the model is shown its own drawing",
+    text: DESCRIBE_PROMPT,
+    link: null,
+  },
+  {
+    file: "tip_pouch.txt",
+    label: "the tip pouch prompt: an AI wrote it, then an AI drew the pouch from it",
+    text: POUCH_PROMPT,
+    link: { href: "/pouch", text: "see the pouch »" },
+  },
+  {
+    file: "tip_screen.txt",
+    label:
+      "the tip screen prompt: we asked Claude Opus 4.8 (high) on claude.ai for an IMAGE, not an SVG. it drew an SVG anyway",
+    text: TIP_SCREEN_PROMPT,
+    link: { href: "/pouch", text: "see the bird »" },
+  },
+];
+
+const win95 = "Tahoma, 'MS Sans Serif', Geneva, sans-serif";
+
+
+  <div
+    class="mt-4 text-left text-[15px] leading-relaxed text-gray-800"
+    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+  >
+    <p>
+      A prompt is not a request. A prompt is a <b>covenant</b> between you
+      and the model. Context is the wetland in which that covenant nests.
+      I have been saying &ldquo;let&apos;s align&rdquo; in every meeting for
+      years. Only now does it mean something. I have a lot of free time now.
+      I have made several decks about it. Nobody has seen them.
+    </p>
+
+    <LessonArt
+      id="prompt"
+      caption="a pelican presenting its context window to a very attentive audience of zero"
+    />
+
+    <p class="mt-2 text-sm text-gray-600 italic">
+      Every illustration in Ground School was drawn by an AI, from prompts of
+      varying craft. Click <b>&ldquo;the exact prompt that drew this&rdquo;</b>{" "}
+      on any of them to see careful prompts versus lazy one-liners and judge the
+      difference yourself. The whole school is a live prompting experiment. You
+      are in it.
+    </p>
+
+    <LessonArt
+      id="prompt-2"
+      caption="one frozen bird, two prompts: a mumble and a covenant, two very different pelicans"
+    />
+
+    <DrBeakman>
+      sit DOWN. the weights are FROZEN. you do not change one of those billions of dials
+      by typing; the only thing you steer is what you put in front of the bird. that is prompting.
+    </DrBeakman>
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">
+      our covenants (the prompts in production, verbatim)
+    </h2>
+    <p>
+      Radical transparency: a value I can afford because there is no
+      competitive advantage left to protect. These are the exact strings this
+      website sends. Nothing more.
+    </p>
+    {
+      PROMPTS.map((p) => (
+        <div
+          class="mt-4"
+          style={{
+            background: "#c0c0c0",
+            border: "2px solid",
+            borderColor: "#ffffff #808080 #808080 #ffffff",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: "#000080",
+              color: "#fff",
+              padding: "2px 3px 2px 6px",
+              fontSize: "11px",
+              fontWeight: 700,
+              fontFamily: win95,
+            }}
+          >
+            <span>📝 NotepadAI - {p.file}</span>
+            <span
+              aria-hidden="true"
+              style={{
+                display: "flex",
+                width: 16,
+                height: 14,
+                alignItems: "center",
+                justifyContent: "center",
+                background: "#c0c0c0",
+                color: "#000",
+                border: "1px solid",
+                borderColor: "#ffffff #808080 #808080 #ffffff",
+                fontSize: 10,
+                lineHeight: 1,
+              }}
+            >
+              ×
+            </span>
+          </div>
+          <p
+            style={{
+              margin: "6px 8px 0",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#3b0764",
+              fontFamily: win95,
+            }}
+          >
+            {p.label}
+            {p.link && (
+              <>
+                {" "}
+                <a href={p.link.href}>{p.link.text}</a>
+              </>
+            )}
+          </p>
+          <PromptCopy client:visible text={p.text} />
+        </div>
+      ))
+    }
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">first, context</h2>
+    <p>
+      You already know the bird&apos;s working memory from the{" "}
+      <a href="/pelicanplus/context-window" class="text-blue-700 underline">context window</a>{" "}
+      lesson: immediate, precise, wiped every new chat. So treat the model as a{" "}
+      <b>brilliant pelican-drawing intern with total amnesia</b> you met in an
+      elevator. It knows nothing about your company, your codebase, or what you
+      said thirty seconds ago. Every conversation starts in a blank wetland.
+    </p>
+    <p class="mt-3">
+      <b>Context engineering</b> is the discipline of placing the right
+      information in front of the model at the right moment: relevant documents,
+      a worked example or two, the constraints that actually matter. Andrej
+      Karpathy named it in 2025; Simon Willison explained why the rename
+      mattered. &ldquo;Prompt engineering&rdquo; had been colonized by Twitter
+      threads about magic words and jailbreak tricks. Context engineering points
+      at the actual craft: what goes in the window, in what order, and why.
+      (The other one has a LinkedIn certification. SQUAWK.)
+    </p>
+    <p class="mt-3">
+      The flip side, also from that lesson: more is not better. Irrelevant tokens
+      <i>distract</i> the bird and lower accuracy (the &ldquo;lost in the
+      middle&rdquo; effect, extremely relatable if you have sat in a long
+      meeting). The optimal context is curated: short, on-topic, no twelve
+      tangents. This is why &ldquo;new chat&rdquo; is a power move. The bird does
+      not miss the old conversation. It never knew anything was anywhere.
+    </p>
+
+    <LessonArt
+      id="prompt-3"
+      caption="curating the wetland: a tidy short context beats a swamp of junk tokens"
+    />
+
+    <DrBeakman compact img="dr-beakman-2">
+      more context is not better context. junk tokens distract the bird and tank accuracy.
+      curate the wetland, your little meat-brain.
+    </DrBeakman>
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">then, the prompt</h2>
+    <p>
+      Once the bird has its habitat, you must ask. Clearly. Mumble at the model
+      and it will give you a mumbled pelican. I learned this the hard way. I
+      also learned it the other hard way, which is getting laid off.
+    </p>
+    <p class="mt-3">
+      And remember the{" "}
+      <a href="/pelicanplus/reasoning" class="text-blue-700 underline">reasoning</a>{" "}
+      lesson: each token does only a sliver of computation, so demanding a
+      one-word answer to a hard question crams all the thinking into a single
+      forward pass it cannot afford. Give the bird runway. Let it lay out steps
+      out loud. Visionaries reflect. Then they act. Then they write a substack
+      about it.
+    </p>
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">what wins (best practices)</h2>
+    <ul class="ml-5 list-disc space-y-2">
+      <li>
+        <b>Be specific about outcome and format.</b> &ldquo;A side-view SVG,
+        one pelican, one bicycle&rdquo; beats &ldquo;draw a bird, surprise me.&rdquo;
+      </li>
+      <li>
+        <b>Show, don&apos;t just tell.</b> One or two examples of the ideal
+        output (<b>few-shot</b>) is worth a thousand adjectives. This is not folk
+        wisdom: it is the headline result of the GPT-3 paper (Brown et al., 2020),
+        which showed a big enough model learns a new task just from examples in
+        the prompt, no retraining. Prompting became a craft the day that worked.
+      </li>
+      <li>
+        <b>Give the model room to think.</b> Chain of thought is not a trick;
+        it is the bird doing its job correctly.
+      </li>
+      <li>
+        <b>Feed facts in rather than trusting recall.</b> If accuracy matters,
+        put the source in the window.
+      </li>
+      <li>
+        <b>Front-load the context that matters</b> and cut the noise.
+      </li>
+      <li>
+        <b>Iterate ruthlessly.</b> The first pelican is a draft.
+      </li>
+    </ul>
+
+    <DrBeakman compact img="dr-beakman-3">
+      few-shot is the strongest move: drop two worked examples in and the bird picks up
+      the pattern, no retraining. that is GPT-3&apos;s whole headline result. *burp*
+    </DrBeakman>
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">
+      what we do not do here (anti-patterns)
+    </h2>
+    <ul class="ml-5 list-disc space-y-2">
+      <li>
+        <b>&ldquo;Make it good.&rdquo;</b> Not a vision. A shrug. The model
+        will shrug back with many feathers.
+      </li>
+      <li>
+        <b>Bribing or threatening the bird.</b> &ldquo;I&apos;ll tip you
+        $200.&rdquo; Folklore. Lead with clarity instead. Or tip me. I have
+        bills.
+      </li>
+      <li>
+        <b>Contradicting yourself.</b> &ldquo;Be exhaustive but keep it to
+        one line.&rdquo; Pick a lane. The bird will pick the worse one.
+      </li>
+      <li>
+        <b>Burying the ask</b> in paragraph nine. If it matters, it goes first.
+      </li>
+      <li>
+        <b>Assuming it remembers.</b> The intern has amnesia. Lovable amnesia,
+        but amnesia.
+      </li>
+      <li>
+        <b>Dumping the whole codebase in</b> and hoping for the best. Context
+        engineering means <i>curating</i>. Junk in, junk out, just slower.
+      </li>
+    </ul>
+
+    <LessonArt
+      id="prompt-4"
+      caption="the temperature dial: a disciplined bird at zero, a poet at a wine tasting cranked high"
+    />
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">
+      the dial we refuse to touch (temperature &amp; variability)
+    </h2>
+    <p>
+      Every time the bird picks its next token, it samples from a probability
+      distribution over every word it has ever learned. The dial on that
+      distribution is <b>temperature</b>. Turn it down toward zero and the
+      model becomes a disciplined executive: focused, repeatable, a little
+      boring. Turn it up and it becomes a poet at a wine tasting: expressive,
+      surprising, occasionally a war crime.
+    </p>
+    <p class="mt-3">
+      Its cousins, <b>top-p</b> (nucleus sampling) and <b>top-k</b>, decide
+      how wide a pool of candidates the model may consider. top-p: only tokens
+      whose cumulative probability adds up to P%. top-k: only the top K
+      candidates, full stop. A newer method, <b>min-p</b>, scales the cutoff
+      dynamically. The field keeps inventing new dials. You are probably fine
+      with just temperature.
+    </p>
+    <p class="mt-3">
+      This is why the same model, handed the identical prompt, nests two
+      completely different pelicans on two different mornings. That is
+      variability, and variability is where the magic and the horror both live.
+      On the homepage we touch none of these dials. Factory default, sample
+      freely. The pelican you see is the one they made, not one we tuned into
+      looking good. Anyone can crank the temperature until something pretty
+      falls out. We would rather show you the factory bird. Beaks and all.
+    </p>
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">the mission</h2>
+    <p>
+      The benchmark on the homepage, one naive prompt, zero context, zero
+      sampling params, is the opposite of everything I just told you. That is
+      intentional. It measures the bird, not the operator. A raw capability
+      signal: what can this model do, alone, with nothing? A humble question.
+      Also, clearly, a hilarious question.
+    </p>
+    <p class="mt-3">
+      But you are an operator. Curate your wetland, craft your covenant, give
+      the bird room to think. Context engineering is not about tricking the
+      bird. It is about giving it everything it needs to do the job you
+      actually want done. The bird wants to help. It was trained to want this.
+      SQUAWK.
+    </p>
+
+    <DrBeakman img="dr-beakman-4">
+      same frozen bird, two prompts: garbage from the lazy one, a clean side-view pelican
+      from the careful one. you steer an unchangeable mind by what you put in front of it.
+      kind of magnificent. go.
+    </DrBeakman>
+
+    <p class="mt-6 border-t border-dashed border-purple-300 pt-3 text-sm text-gray-600">
+      <b>📚 sources (real experts, not a displaced visionary):</b>
+    </p>
+    <ul class="list-disc space-y-1 pl-6 text-sm">
+      <li>
+        Andrej Karpathy,{" "}
+        <a
+          href="https://www.youtube.com/watch?v=7xTGNNLPyMI"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          &ldquo;Deep Dive into LLMs like ChatGPT&rdquo;
+        </a>{" "}
+        (context windows and prompting sections sourced directly here)
+      </li>
+      <li>
+        Anthropic,{" "}
+        <a
+          href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          &ldquo;Prompt engineering overview&rdquo;
+        </a>{" "}
+        (clarity, few-shot examples, chain of thought, XML structure)
+      </li>
+      <li>
+        OpenAI,{" "}
+        <a
+          href="https://platform.openai.com/docs/guides/prompt-engineering"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          &ldquo;Prompt engineering&rdquo;
+        </a>{" "}
+        (six strategies; reasoning models, few-shot patterns)
+      </li>
+      <li>
+        Simon Willison,{" "}
+        <a
+          href="https://simonwillison.net/2025/jun/27/context-engineering/"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          &ldquo;Context engineering&rdquo;
+        </a>{" "}
+        (why the rename mattered)
+      </li>
+      <li>
+        Brown et al. (2020),{" "}
+        <a
+          href="https://arxiv.org/abs/2005.14165"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          &ldquo;Language Models are Few-Shot Learners&rdquo; (GPT-3)
+        </a>{" "}
+        (the result that made in-context examples, the heart of prompting, actually work)
+      </li>
+    </ul>
+  </div>

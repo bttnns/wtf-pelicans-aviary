@@ -1,0 +1,289 @@
+---
+slug: "/about"
+nav: "the art & the tech"
+blurb: "the capstone: why a pelican on a bicycle is a genuinely hard AI benchmark."
+teaches: "AI benchmarks, SVG generation, spatial reasoning, world models"
+order: 16
+---
+import LessonArt from "../../../components/LessonArt.astro";
+import DrBeakman from "../../../components/DrBeakman.astro";
+
+
+  <div
+    class="mt-2 text-[15px] leading-relaxed text-gray-800"
+    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+  >
+    <p class="mt-4 text-lg">
+      every time a lab ships a new model, the internet asks it to draw a pelican
+      riding a bicycle. this is the museum. benchmark stolen lovingly from{" "}
+      <a href="https://simonwillison.net/tags/pelican-riding-a-bicycle/" target="_blank" rel="noreferrer">
+        simonw
+      </a>; we just framed the evidence.
+    </p>
+
+    <DrBeakman img="dr-beakman-2">
+      one sentence, every model, no edits, no retries. *burp* hold everything still
+      and the bird becomes a controlled experiment. that is the entire trick.
+    </DrBeakman>
+
+    <h2 class="wtf-title mt-8 mb-2 text-2xl text-purple-900">what this is (and who is writing)</h2>
+    <p>
+      I am the founder, CEO, and principal pelican researcher of pelicans.wtf.
+      The method: every new model gets exactly one sentence,{" "}
+      <em>"Generate an SVG of a pelican riding a bicycle,"</em> and not a word
+      more. I frame the result, date it, log its provenance, hang it on the wall.
+      A longitudinal study of machine cognition wearing the costume of a gallery
+      of cursed birds.
+    </p>
+    <p class="mt-3">
+      Full disclosure: we are inside the largest capital bubble in the history of
+      technology. My previous employer was "disrupted by AI," the polite term for
+      "the board stopped returning my calls." While the rest of the field points
+      frontier models at slide decks, I point them at a bird on a bicycle.
+      Because that is a thing you can actually measure. SQUAWK.
+    </p>
+
+    <LessonArt
+      id="about-2"
+      caption="the museum: cursed pelican drawings framed on a gallery wall, each with a tiny wall label"
+    />
+
+    <h2 class="wtf-title mt-8 mb-2 text-2xl text-purple-900">the method (it is a readymade)</h2>
+    <p>
+      I did not draw any of these. The machines did. Every pelican is a
+      readymade: pulled from the model with no edits, no retry-until-pretty, no
+      human touch-ups. Same prompt. No system prompt. No scaffolding. In an
+      industry that airbrushes every demo, the control is the contribution.
+    </p>
+    <p class="mt-3">
+      The wall label is half the work: model name, version slug, render date,
+      token cost. The provenance basically <em>is</em> the data. The bad ones are
+      not mistakes; they are the findings. The melting, six-legged,
+      beak-through-the-spokes early attempts are the most valuable specimens in
+      the building: the fossil record of machine spatial cognition learning to see.
+    </p>
+
+    <DrBeakman compact img="dr-beakman-3" tag="DR. BEAKMAN, UNIMPRESSED">
+      the bad birds are not bloopers we hide, kiddo. they ARE the data. a melted
+      six-legged disaster is a measurement.
+    </DrBeakman>
+    <p class="mt-3">
+      It looks like 1998 on purpose. The content is the most expensive technology
+      our species has ever built; the frame is a GeoCities page with a marquee
+      and a visitor counter. That gap is the thesis.
+    </p>
+
+    <h2 class="wtf-title mt-8 mb-2 text-2xl text-purple-900">why this is crazy, and crazy hard</h2>
+    <p>
+      You already know the strangest part, because{" "}
+      <a href="/pelicanplus/flying-blind" class="text-blue-700 underline">Flying Blind</a>{" "}
+      was built on it: the model is not drawing, it cannot see, it writes the whole
+      picture as code, completely blind, no canvas, no reference image, inventing
+      the scene from words and emitting it as geometry.
+    </p>
+
+    <LessonArt
+      id="about"
+      caption="a blind blueprint: the model drawing a pelican on a bicycle without once seeing a canvas"
+    />
+
+    <p class="mt-3">
+      So the museum is not really asking &ldquo;can it draw.&rdquo; It is asking
+      whether a model can hold a whole scene in its head and commit it to math,
+      sight unseen: hundreds of precise numbers in a single forward pass,
+      committing to where the wheel goes before it has placed the frame, with no
+      chance to squint and mutter &ldquo;hm, the beak is in the spokes.&rdquo; That
+      demands three hard things at once: a <strong>world model</strong> (what
+      is a pelican, what is a bicycle, how does a bird plausibly perch on one);{" "}
+      <strong>spatial reasoning</strong> (composing those parts in 2D with correct
+      relative positions); and <strong>code generation</strong> (translating that
+      mental image into valid vector geometry instead of spaghetti). It cannot
+      cheat by memorizing: the combination is rare enough that the model must
+      compose rather than recall. Instantly legible, nearly impossible to game,
+      visibly improving generation over generation. One bird on a bike at a time.
+    </p>
+
+    <DrBeakman compact img="dr-beakman-4">
+      world model, spatial reasoning, code generation, all three at once, one blind
+      pass. you cannot memorize your way to a scene this rare. you compose or you
+      faceplant.
+    </DrBeakman>
+
+    <p class="mt-3">
+      That last bit, the visible improvement, is the whole reason a dumb bird
+      drawing is a real instrument. The machine doing it is the end of a long
+      relay race. Geoffrey Hinton and Yoshua Bengio spent decades arguing that
+      networks should learn their own features instead of having them hand-coded;
+      in 2012 that bet paid off when <b>AlexNet</b> crushed an image-recognition
+      contest and the field stopped laughing. Fei-Fei Li had built <b>ImageNet</b>
+      {" "}(2009), the giant labeled photo pile that made the proof possible. In
+      2017 a Google team (Ashish Vaswani and colleagues, &ldquo;Attention Is All
+      You Need&rdquo;) published the <b>transformer</b>, the architecture every
+      bird in this gallery runs on. Wire that to enough text and you get the GPT
+      line, then ChatGPT in 2022, then the reasoning and world-model era we are
+      standing in now. The pelican is where you watch all of that land, or fail
+      to, in a single picture.
+    </p>
+
+    <LessonArt
+      id="about-3"
+      caption="three hard things at once: world model, spatial reasoning, code generation, balanced on one beak"
+    />
+
+    <h2 class="wtf-title mt-8 mb-2 text-2xl text-purple-900">
+      the capstone: what you are actually measuring now
+    </h2>
+    <p>
+      You have made it through Ground School: tokens (the atom), parameters (the
+      dials), training (raising the egg), the board game that proved a machine
+      could find intuition, context windows (working memory), reasoning (squawking
+      it out), hallucination (the confident dream), prompting (the asking), agents
+      and the loop (the tool-user that took my job), open versus closed and local
+      inference (the bird in your garage), and the bubble and the slop bowl (the
+      bill and the flood). With all of that, a pelican on a bicycle stops being a
+      joke. It is a live, public stress-test of world modeling, spatial reasoning,
+      and code generation, all three at once, in a single forward pass, with no
+      canvas. Every new model gets the same one sentence. The drawing on the wall
+      is the readout of everything the field has learned. SQUAWK.
+    </p>
+
+    <DrBeakman>
+      and the readout is a PICTURE: no spreadsheet, no PhD, you just glance and see
+      if the wheels are round. a clean experiment a toddler can grade. that is, ugh,
+      kind of elegant. do not tell anyone I praised a bird drawing.
+    </DrBeakman>
+
+    <h2 class="wtf-title mt-8 mb-2 text-2xl text-purple-900">
+      and here is the part the bitterness cannot kill
+    </h2>
+    <p>
+      Step back from the cursed bicycles for one second. We are, right now, the
+      first species to ever sit down and deliberately build another mind. The
+      researchers and labs and the rest of us are training the most capable
+      intelligence that has existed on this planet, teaching it to reason, to
+      see, and (the moment it meets robotics) to reach into the physical world
+      and actually act. A pelican benchmark is a tiny, ridiculous window onto the
+      single most extraordinary thing our species has ever attempted.
+    </p>
+    <p class="mt-3">
+      I lost my job to it and I am still, against my own better judgment,
+      astonished. Look at what we are making. It is amazing. SQUAWK.
+    </p>
+
+    <LessonArt
+      id="about-4"
+      caption="the first species to build another mind: a pelican shaking wings with the glowing thing it made"
+    />
+
+    <h2 class="wtf-title mt-8 mb-2 text-2xl text-purple-900">📚 sources &amp; further reading</h2>
+    <p class="mb-2 text-sm text-gray-600">the birds cite their sources. yes, even the cursed ones.</p>
+    <ul class="list-disc space-y-1 pl-6 text-sm">
+      <li>
+        Simon Willison,{" "}
+        <a
+          href="https://simonwillison.net/tags/pelican-riding-a-bicycle/"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          the pelican-riding-a-bicycle corpus
+        </a>{" "}
+        the original benchmark this museum is a tribute to
+      </li>
+      <li>
+        <a href="https://github.com/simonw/pelican-bicycle" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          simonw/pelican-bicycle
+        </a>
+        , the benchmark repo
+      </li>
+      <li>
+        <a
+          href="https://grokipedia.com/page/Pelican_on_a_bicycle_AI_benchmark"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          Grokipedia: Pelican on a bicycle (AI benchmark)
+        </a>
+      </li>
+      <li>
+        <a href="https://blog.yupp.ai/svg/" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          Yupp SVG AI leaderboard
+        </a>
+      </li>
+      <li>
+        <a href="https://nilethebot.github.io/pelican-timeline/" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          Every Pelican That Ever Rode a Bicycle (timeline)
+        </a>
+      </li>
+      <li>
+        Andrej Karpathy,{" "}
+        <a
+          href="https://www.youtube.com/watch?v=zjkBMFhNj_g"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          &ldquo;Intro to Large Language Models&rdquo;
+        </a>
+        {" "}the best 1-hour LLM primer on the internet, from someone who actually built them
+      </li>
+      <li>
+        Vaswani et al. (2017),{" "}
+        <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          &ldquo;Attention Is All You Need&rdquo;
+        </a>{" "}
+        the transformer paper; the architecture every bird in this gallery runs on
+      </li>
+      <li>
+        Deng, Li (Fei-Fei Li) et al. (2009),{" "}
+        <a href="https://www.image-net.org/" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          ImageNet
+        </a>{" "}
+        the labeled-image corpus whose 2012 AlexNet moment kicked off the deep-learning era
+      </li>
+      <li>
+        LeCun, Bengio, Hinton (2015),{" "}
+        <a href="https://www.nature.com/articles/nature14539" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          &ldquo;Deep Learning&rdquo; (Nature)
+        </a>{" "}
+        the three later-Turing-Award authors laying out the field this museum measures
+      </li>
+      <li>
+        <a
+          href="https://arxiv.org/abs/2211.09110"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          Liang et al., &ldquo;Holistic Evaluation of Language Models (HELM)&rdquo; (arXiv 2211.09110)
+        </a>{" "}
+        Stanford CRFM framework for multi-metric LLM evaluation
+      </li>
+      <li>
+        <a
+          href="https://arxiv.org/abs/2403.04132"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-700 underline"
+        >
+          Chiang et al., &ldquo;Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference&rdquo; (arXiv 2403.04132)
+        </a>{" "}
+        the paper behind{" "}
+        <a href="https://lmarena.ai" target="_blank" rel="noreferrer" class="text-blue-700 underline">lmarena.ai</a>,
+        crowdsourced human preference rankings
+      </li>
+    </ul>
+
+    <p class="mt-6 text-sm text-gray-500" style={{ fontFamily: "inherit" }}>
+      The pelican-on-a-bicycle benchmark is{" "}
+      <a
+        href="https://simonwillison.net/tags/pelican-riding-a-bicycle/"
+        target="_blank"
+        rel="noreferrer"
+      >
+        simonw
+      </a>
+      &apos;s idea. This is a tribute.
+    </p>
+  </div>

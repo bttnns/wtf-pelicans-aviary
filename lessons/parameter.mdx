@@ -1,0 +1,184 @@
+---
+slug: "/learn/parameter"
+nav: "parameters"
+blurb: "the billions of little dials that ARE the bird. nobody set them by hand."
+teaches: "parameters, weights, neural network scale"
+order: 2
+---
+import LessonArt from "../../../components/LessonArt.astro";
+import DrBeakman from "../../../components/DrBeakman.astro";
+
+
+  <div
+    class="mt-4 text-left text-[15px] leading-relaxed text-gray-800"
+    style={{ fontFamily: "'Times New Roman', Times, serif" }}
+  >
+    <p>
+      Last lesson the bird ate tokens. This lesson is about where it keeps what
+      it learned, and the answer the press releases skip: a large language model
+      is concretely <b>just two files.</b> A very large numbers file (the
+      parameters) and a very small code file (the run program). That is the whole
+      product. The bird is not magic; it is an address book of floating-point
+      decimals and a few hundred lines of math.
+    </p>
+
+    <DrBeakman>
+      sit DOWN. &ldquo;the model&rdquo; is two files: a giant numbers file and a
+      tiny program to read it. no oracle, no soul, just dials. *burp*
+    </DrBeakman>
+
+    <LessonArt
+      id="parameter"
+      caption="a pelican whose entire body is made of tiny numbered dials, being adjusted by a very tired GPU"
+    />
+
+    <LessonArt
+      id="parameter-2"
+      caption="the whole model as just two files on a floppy disk: one huge, one tiny"
+    />
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">the two files, concretely</h2>
+    <p>
+      Take Llama 2 70B, the model Andrej Karpathy walks through in his intro
+      talk. Seventy billion parameters, each stored as a 2-byte float: a
+      <b>140 GB parameters file.</b> The inference code that runs it is roughly
+      500 lines of C with no external dependencies. Put both on a laptop, compile
+      once, and you have a full conversation with no internet, no subscription,
+      no lab watching. The bird is yours.
+    </p>
+    <p class="mt-3">
+      By 2026 the open-weights ecosystem pushed further: Meta&apos;s Llama 4
+      Scout packs a <b>10-million-token context window</b> into a 109-billion-parameter
+      mixture-of-experts model that fits on a single H100 GPU (only 17 billion
+      parameters fire per token). The weights keep getting more capable per gigabyte.
+    </p>
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">a lossy zip of the internet</h2>
+    <p>
+      Training ingested roughly <b>2 trillion tokens of text</b> (for Llama 2;
+      modern frontier runs go much higher) and spent months nudging 70 billion
+      little dials until the model could predict the next token accurately. Think
+      of the parameters as a <b>zip file of the internet</b>, compressed about
+      100x, but <i>lossy</i>, like a JPEG, not lossless.
+    </p>
+    <p class="mt-3">
+      You get the gestalt: the shape of facts, the idioms, the vibes. Not a
+      verbatim copy. The bird knows roughly what an ISBN looks like, which is
+      exactly why it can hallucinate a convincing one. The pouch holds the shape
+      of every fish it has eaten, not the fish themselves.
+    </p>
+
+    <DrBeakman compact img="dr-beakman-2">
+      it is a lossy zip of the internet, like a JPEG. that is WHY it hallucinates
+      a perfect-looking fake ISBN.
+    </DrBeakman>
+
+    <LessonArt
+      id="parameter-3"
+      caption="the whole internet compressed into a pelican's pouch like a lossy zip file"
+    />
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">nobody set the dials by hand</h2>
+    <p>
+      Nobody sat in a cubicle typing values into{" "}
+      <i>what-a-pelican-looks-like.csv</i>. Training set them automatically:
+      feed in text, predict the next token, compare to reality, nudge the dials,
+      repeat, trillions of times.
+    </p>
+    <p class="mt-3">
+      The Llama 2 70B run used roughly <b>1.7 million GPU-hours</b> on A100s.
+      Cloud cost estimates range from <b>$2 million to $8 million</b> (Meta got
+      a bulk discount; they did). Frontier models in 2025-2026 cost orders of
+      magnitude more. This is why &ldquo;just retrain it&rdquo; is not a weekend
+      project and why your landlord is not building a GPT-5 competitor in his
+      garage, no matter what the podcast says.
+    </p>
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">bigger is (reliably) smarter, to a point</h2>
+    <p>
+      The idea that piling on more dials would pay off is not new. Geoffrey
+      Hinton and his students lit the fuse in 2012, when their deep network
+      AlexNet won the ImageNet contest (Fei-Fei Li&apos;s benchmark) by a
+      humiliating margin and convinced everyone that bigger, deeper, hungrier
+      networks were the way forward. Language models inherited that lesson. The
+      spooky thing about parameters is how <i>boring</i> the scaling law turned
+      out to be: next-token accuracy is a smooth, predictable function of{" "}
+      <b>N (parameters) and D (training tokens)</b>. More dials plus more data
+      equals a reliably better bird. This is why the labs kept shipping models
+      with names that are just bigger numbers.
+    </p>
+    <p class="mt-3">
+      By 2025-2026, distillation and mixture-of-experts (only a fraction of dials
+      fire per token) deliver GPT-4-era performance from a model an order of
+      magnitude smaller. The dials got cheaper per unit of smart. The flock got
+      denser. The venture capitalists got louder.
+    </p>
+
+    <DrBeakman compact img="dr-beakman-3">
+      more dials plus more data equals reliably smarter. it is a boring power law,
+      and THAT is the spooky part.
+    </DrBeakman>
+
+    <LessonArt
+      id="parameter-4"
+      caption="a smooth rising graph: more dials plus more data equals a smarter bird"
+    />
+
+    <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">why you should care</h2>
+    <p>
+      &ldquo;The model&rdquo; is not a mysterious oracle; it is a matrix
+      multiplication your laptop can do if you have the file. When a lab says
+      they are &ldquo;improving the model,&rdquo; they mean: a training job
+      produced a different set of dials. When they say the model
+      &ldquo;knows&rdquo; something, they mean: it was compressed, lossily, into
+      the dial positions. The bird is the dials. And nobody set them: the next
+      lesson is the strange, expensive process that did. SQUAWK.
+    </p>
+
+    <DrBeakman img="dr-beakman-4">
+      not one of those billion dials was set by a human, your little meat-brain.
+      we GREW them with gradient descent, and it works, which is genuinely
+      deranged and kind of beautiful. do not tell anyone I said that.
+    </DrBeakman>
+
+    <p class="mt-6 border-t border-dashed border-purple-300 pt-3 text-sm text-gray-600">
+      <b>📚 sources, because a bird is not a peer-reviewed citation:</b>
+      <ul class="list-disc space-y-1 break-words pl-6 text-sm">
+        <li>
+          Andrej Karpathy,{" "}
+          <a href="https://www.youtube.com/watch?v=zjkBMFhNj_g" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+            &ldquo;[1hr Talk] Intro to Large Language Models&rdquo;
+          </a>{" "}
+          (two-files framing, zip-of-the-internet analogy, scaling laws)
+        </li>
+        <li>
+          Krizhevsky, Sutskever, Hinton (2012),{" "}
+          <a href="https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+            &ldquo;ImageNet Classification with Deep Convolutional Neural Networks&rdquo; (AlexNet)
+          </a>{" "}
+          (the 2012 result that kicked off the deep-learning scaling era, on Fei-Fei Li&apos;s ImageNet)
+        </li>
+        <li>
+          Kaplan et al. (2020),{" "}
+          <a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+            &ldquo;Scaling Laws for Neural Language Models&rdquo;
+          </a>{" "}
+          (loss as a power-law of parameters, data, and compute)
+        </li>
+        <li>
+          Hoffmann et al. (2022),{" "}
+          <a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+            &ldquo;Training Compute-Optimal Large Language Models&rdquo; (Chinchilla)
+          </a>{" "}
+          (optimal token-to-parameter ratio for a given compute budget)
+        </li>
+        <li>
+          Meta AI (2023),{" "}
+          <a href="https://ai.meta.com/research/publications/llama-2-open-foundation-and-fine-tuned-chat-models/" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+            &ldquo;Llama 2: Open Foundation and Fine-Tuned Chat Models&rdquo;
+          </a>{" "}
+          (1.7M GPU-hour training figure for the 70B model)
+        </li>
+      </ul>
+    </p>
+  </div>

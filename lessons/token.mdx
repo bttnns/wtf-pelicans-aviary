@@ -1,0 +1,166 @@
+---
+slug: "/learn/token"
+nav: "tokens"
+blurb: "the atom of everything. the bird does not read words, it reads tokens."
+teaches: "tokens, tokenization, byte pair encoding"
+order: 1
+---
+import LessonArt from "../../../components/LessonArt.astro";
+import DrBeakman from "../../../components/DrBeakman.astro";
+
+
+<div
+  class="mt-4 text-left text-[15px] leading-relaxed text-gray-800"
+  style={{ fontFamily: "'Times New Roman', Times, serif" }}
+>
+  <p>
+    Here is the first thing nobody tells you, and it is load-bearing for
+    everything else in this school: <b>the bird cannot read.</b> When you type{" "}
+    <i>pelican</i> into a model, it does not see seven proud letters. It sees a
+    couple of numbered chunks called <b>tokens</b>, and it only ever eats and
+    regurgitates tokens. Never a letter. Never a whole word. Always a beakful of
+    token.
+  </p>
+
+  <DrBeakman>
+    sit DOWN. the bird never sees letters, your little meat-brain. it eats
+    numbered chunks and pukes numbered chunks, end of story.
+  </DrBeakman>
+
+  <LessonArt
+    id="token"
+    caption="a pelican eating a word that has been chopped into token-pieces"
+  />
+
+  <LessonArt
+    id="token-2"
+    caption="the word 'pelican' on a chopping board, sliced into numbered chunks"
+  />
+
+  <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">a token is a chunk, not a letter</h2>
+  <p>
+    A token is a <i>piece</i> of text: sometimes a whole short word, usually a
+    fragment, sometimes punctuation or whitespace. The model has a fixed menu of
+    them, called its <b>vocabulary</b>. Every bit of text you send gets minced
+    into menu items before the bird tastes any of it.
+  </p>
+  <p class="mt-3">
+    GPT-2 (2019) ate from a menu of about <b>50,000 tokens</b>. GPT-4 (2023)
+    grew that to <b>100,000</b>. GPT-4o (2024) doubled it to roughly{" "}
+    <b>200,000</b>. More menu, bigger bites: the same sentence becomes fewer,
+    fatter tokens and the bird sees more text before its mouth is full. The pouch
+    keeps getting roomier.
+  </p>
+
+  <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">where the menu comes from (BPE)</h2>
+  <p>
+    Nobody hand-wrote 200,000 tokens. The menu is grown by an algorithm with the
+    gloriously unglamorous name <b>byte pair encoding</b>. Rico Sennrich and
+    colleagues brought it into language modeling in 2016 to handle rare words;
+    Alec Radford and the OpenAI team carried the same trick into the GPT line,
+    which is why every model you talk to today still eats from a BPE menu. The
+    recipe:
+  </p>
+  <ol class="mt-2 list-decimal space-y-1 pl-6">
+    <li>Start with every character as its own tiny token.</li>
+    <li>Find the two neighbors that appear together most often. Fuse them. Add to the menu.</li>
+    <li>Repeat tens of thousands of times.</li>
+  </ol>
+  <p class="mt-3">
+    Common pairs like &ldquo;th&rdquo; and &ldquo;ing&rdquo; fuse early. Rare
+    combos stay as crumbs. Common English words become single tokens; unusual
+    words get shredded into pieces; emoji become a whole adventure.
+  </p>
+
+  <DrBeakman compact img="dr-beakman-2">
+    nobody wrote the menu. greediest pairs fuse first, raw statistics carve the
+    rest. *burp*
+  </DrBeakman>
+
+  <LessonArt
+    id="token-3"
+    caption="a giant menu board of token-chunks, common pairs fused together"
+  />
+
+  <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">
+    the strawberry problem (and why it mostly got fixed)
+  </h2>
+  <p>
+    For a few years every AI demo included the trick: ask a model how many r&apos;s
+    are in <i>strawberry</i>. Early models said two. The reason was tokenization:
+    &ldquo;strawberry&rdquo; got chopped into two or three tokens, letters inside
+    a token pur&eacute;ed beyond recognition. You were asking the bird to count
+    sprinkles blended into a smoothie. By 2024-2025 the labs patched this through
+    larger vocabularies and reasoning-focused fine-tuning. Modern models usually
+    get it right. But the lesson stands: a startling amount of model
+    &ldquo;dumbness&rdquo; is tokenization having a moment. The blender is still
+    running. It is just a fancier blender now.
+  </p>
+
+  <DrBeakman compact img="dr-beakman-3" tag="DR. BEAKMAN, UNIMPRESSED">
+    it cannot count r&apos;s because it never saw letters, it saw a smoothie. that
+    is not dumb, that is tokenization.
+  </DrBeakman>
+
+  <LessonArt
+    id="token-4"
+    caption="a pelican peering into a blender full of strawberry smoothie, trying to count the seeds"
+  />
+
+  <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">why you should care</h2>
+  <p>
+    Tokens are the unit of <i>everything</i> downstream. The model thinks in
+    tokens, its memory is measured in tokens, and your bill, the one that
+    replaced your salary, is counted in tokens. The bird is not reading. It is
+    pattern-matching on a menu it memorized during training, and doing it
+    frighteningly well for something that has never seen the alphabet.
+  </p>
+  <p class="mt-3">
+    So: the bird eats tokens. Next question, the one the whole school turns on:
+    where does it keep what it learned? The answer is a pile of numbers nobody
+    set by hand. SQUAWK.
+  </p>
+
+  <DrBeakman img="dr-beakman-4">
+    a thing that eats word-confetti can write you a sonnet. that should not work,
+    and it does, and it is gorgeous, okay? do not tell anyone I said that.
+  </DrBeakman>
+
+  <p class="mt-6 border-t border-dashed border-purple-300 pt-3 text-sm text-gray-600">
+    <b>📚 sources, because a bird is not a peer-reviewed citation:</b>
+    <ul class="list-disc space-y-1 break-words pl-6 text-sm">
+      <li>
+        Andrej Karpathy,{" "}
+        <a href="https://www.youtube.com/watch?v=zduSFxRajkE" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          &ldquo;Let&apos;s build the GPT Tokenizer&rdquo;
+        </a>{" "}
+        and{" "}
+        <a href="https://www.youtube.com/watch?v=7xTGNNLPyMI" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          &ldquo;Deep Dive into LLMs like ChatGPT&rdquo;
+        </a>{" "}
+        (builds the tokenizer from scratch; source of the strawberry explanation)
+      </li>
+      <li>
+        Sennrich, Haddow, Birch (ACL 2016),{" "}
+        <a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          &ldquo;Neural Machine Translation of Rare Words with Subword Units&rdquo;
+        </a>{" "}
+        (the paper that introduced BPE to NLP)
+      </li>
+      <li>
+        OpenAI,{" "}
+        <a href="https://github.com/openai/tiktoken" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          tiktoken (GitHub)
+        </a>{" "}
+        (the fast BPE tokenizer used by GPT models; cl100k for GPT-4, o200k for GPT-4o)
+      </li>
+      <li>
+        Hugging Face,{" "}
+        <a href="https://huggingface.co/docs/tokenizers/en/index" target="_blank" rel="noreferrer" class="text-blue-700 underline">
+          Tokenizers library documentation
+        </a>{" "}
+        (training and running tokenizers in research and production)
+      </li>
+    </ul>
+  </p>
+</div>
