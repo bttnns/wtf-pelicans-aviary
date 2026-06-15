@@ -1,0 +1,27 @@
+name: validate lessons
+
+# Self-validating PR CI: checks every lesson against the Pelican Ground School
+# rules WITHOUT needing the private site code. The site build is still the
+# authoritative gate (it also verifies art ids exist in illustrations.json);
+# this gives contributors fast, local-style feedback on a PR.
+
+on:
+  pull_request:
+    paths:
+      - "lessons/**"
+      - "scripts/validate-lessons.mjs"
+      - ".github/workflows/validate.yml"
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      # Zero-dependency validator: no npm install needed.
+      - name: Validate lessons
+        run: node scripts/validate-lessons.mjs
