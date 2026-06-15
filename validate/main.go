@@ -1,33 +1,14 @@
-// Command validate is the self-contained Pelican Ground School lesson checker.
+// Command validate is the Pelican Ground School lesson checker.
 //
-// It re-checks, inside a PR to THIS repo, the same rules the site build
-// enforces, so a contributor gets fast feedback without cloning the private
-// site code. The site's real pipeline (the remark directive whitelist +
-// rehype-sanitize + the illustrations.json existence check) remains the
-// authoritative gate; this is the friendly early warning.
-//
-// It needs zero network and one tiny dependency (a YAML parser for the
-// frontmatter). Run it from the repo root:
+// Inside a PR to this repo it re-checks the rules the site build enforces, so a
+// contributor gets fast feedback without the private site code. The site build
+// stays the authoritative gate; this is the friendly early warning. It needs no
+// network and one tiny dependency (a YAML parser). Run it from the repo root:
 //
 //	go run ./validate
 //
-// ERRORS (exit 1, hard gate; the same rules the site build enforces):
-//  1. frontmatter present, required keys present and well typed
-//  2. only the whitelisted utilities (:::beakman, ::art, ::promptdemo,
-//     ::ralphloop, :::sources); block vs leaf used correctly
-//  3. no raw HTML tags in the body
-//  4. no em-dashes / en-dashes anywhere (a quiet house rule)
-//  5. ::art ids match ^[a-z0-9][a-z0-9-]*$
-//  6. body-prose links are internal only; external https only inside :::sources;
-//     never http: / javascript: / data:
-//
-// WARNINGS (exit 0, non-blocking nudges about dangling / leftover content):
-//
-//	A. the `order` sequence has gaps, duplicates, or does not start at 1
-//	B. frontmatter keys not in the schema (likely typos / orphaned keys)
-//	C. an empty :::sources block (no links inside)
-//	D. lessons/_template.md has drifted from the current schema
-//	E. a lesson whose `slug` does not look wired into the curriculum
+// Errors (exit 1) are hard rules. Warnings (exit 0) are nudges about leftover or
+// dangling content. The rules themselves are documented in SYNTAX.md.
 package main
 
 import (
@@ -42,211 +23,143 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// requiredKeys are the frontmatter keys every lesson must carry.
+// requiredKeys must appear in every lesson; schemaKeys is the full set (anything
+// else is a likely typo and gets a warning).
 var requiredKeys = []string{"slug", "nav", "blurb", "teaches", "order"}
-
-// knownKeys is the full schema; anything else is suspicious (warning B).
-var knownKeys = map[string]bool{
-	"slug": true, "nav": true, "blurb": true,
-	"teaches": true, "order": true, "sources": true,
+var schemaKeys = map[string]bool{
+	"slug": true, "nav": true, "blurb": true, "teaches": true, "order": true, "sources": true,
 }
 
-// The lesson "utilities" whitelist. This list is mirrored by the site's remark
-// directive plugin (site/src/markdown/directives.mjs) and a parity test in the
-// site asserts the two agree, so the contributor CI and the site build cannot
-// silently drift. Same code-mirror pattern as the benchmark PROMPTS.
+// The lesson "utilities" whitelist, mirrored by the site's remark plugin
+// (site/src/markdown/directives.mjs); a site parity test asserts the two agree.
 //
 //	AVIARY-WHITELIST-PARITY (do not rename this marker; the parity test greps it)
 var blockDirectives = map[string]bool{"beakman": true, "sources": true}
 var leafDirectives = map[string]bool{"art": true, "promptdemo": true, "ralphloop": true}
 
 var (
-	idRe         = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*$`)
-	dashRe       = regexp.MustCompile("[–—]")
-	inlineCodeRe = regexp.MustCompile("`[^`]*`")
-	fenceRe      = regexp.MustCompile("^\\s*```")
-	containerRe  = regexp.MustCompile(`^\s*:::([a-zA-Z][\w-]*)`)
-	containerEnd = regexp.MustCompile(`^\s*:::\s*$`)
-	leafRe       = regexp.MustCompile(`^\s*::([a-zA-Z][\w-]*)(\{[^}]*\})?\s*$`)
-	artIDRe      = regexp.MustCompile(`id="([^"]*)"`)
-	htmlTagRe    = regexp.MustCompile(`</?[a-zA-Z][a-zA-Z0-9]*(\s|>|/)`)
-	commentRe    = regexp.MustCompile(`^\s*<!--`)
-	linkRe       = regexp.MustCompile(`\[[^\]]*\]\(([^)]+)\)`)
-	intDigitsRe  = regexp.MustCompile(`^\d+$`)
-	schemeRe     = regexp.MustCompile(`^([a-zA-Z][a-zA-Z0-9+.-]*):`)
-
-	internalHosts = map[string]bool{"pelicans.wtf": true, "www.pelicans.wtf": true}
+	reDash     = regexp.MustCompile("[–—]")
+	reCode     = regexp.MustCompile("`[^`]*`")
+	reFence    = regexp.MustCompile("^\\s*```")
+	reBlock    = regexp.MustCompile(`^\s*:::([a-zA-Z][\w-]*)`)
+	reBlockEnd = regexp.MustCompile(`^\s*:::\s*$`)
+	reLeaf     = regexp.MustCompile(`^\s*::([a-zA-Z][\w-]*)(\{[^}]*\})?\s*$`)
+	reArtID    = regexp.MustCompile(`id="([^"]*)"`)
+	reID       = regexp.MustCompile(`^[a-z0-9][a-z0-9-]*$`)
+	reHTML     = regexp.MustCompile(`</?[a-zA-Z][a-zA-Z0-9]*(\s|>|/)`)
+	reComment  = regexp.MustCompile(`^\s*<!--`)
+	reLink     = regexp.MustCompile(`\[[^\]]*\]\(([^)]+)\)`)
+	reFront    = regexp.MustCompile(`(?s)^---\n(.*?)\n---\n?`)
 )
 
-// issue is one error or warning, with an optional source location.
-type issue struct {
-	file string
-	line int // 0 means "no specific line"
-	msg  string
-}
+var internalHosts = map[string]bool{"pelicans.wtf": true, "www.pelicans.wtf": true}
 
-func (i issue) String() string {
-	loc := i.file
-	if i.line > 0 {
-		loc = fmt.Sprintf("%s:%d", i.file, i.line)
+// Collected as we go; warnings never fail the run, errors set the exit code.
+var errors, warnings []string
+
+func fail(file string, line int, msg string) { errors = append(errors, at(file, line)+msg) }
+func warn(file string, line int, msg string) { warnings = append(warnings, at(file, line)+msg) }
+
+func at(file string, line int) string {
+	switch {
+	case file == "":
+		return ""
+	case line > 0:
+		return fmt.Sprintf("%s:%d: ", file, line)
+	default:
+		return file + ": "
 	}
-	if loc == "" {
-		return i.msg
-	}
-	return loc + ": " + i.msg
 }
-
-// frontmatter holds a parsed lesson's metadata, the source key order (so we can
-// flag unknown keys), and where the body begins.
-type frontmatter struct {
-	fields     map[string]any
-	keyOrder   []string
-	present    bool
-	bodyStart  int // 1-based line where the body begins
-	bodyOffset int // byte offset of the body within the source
-	src        string
-}
-
-func (f frontmatter) body() string {
-	if !f.present {
-		return f.src
-	}
-	return f.src[f.bodyOffset:]
-}
-
-// lesson pairs a relative path with its parsed frontmatter for cross-file checks.
-type lesson struct {
-	file string
-	fm   frontmatter
-}
-
-var (
-	errors   []issue
-	warnings []issue
-)
-
-func fail(file string, line int, msg string) { errors = append(errors, issue{file, line, msg}) }
-func warn(file string, line int, msg string) { warnings = append(warnings, issue{file, line, msg}) }
 
 func main() {
-	root, err := os.Getwd()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "cannot determine working directory:", err)
-		os.Exit(1)
+	dir := "lessons"
+	if _, err := os.Stat(dir); err != nil {
+		dir = filepath.Join("..", "lessons") // also runnable from inside validate/
 	}
-	// Run from the repo root (the documented way) or from inside validate/.
-	lessonsDir := filepath.Join(root, "lessons")
-	if _, e := os.Stat(lessonsDir); e != nil {
-		lessonsDir = filepath.Join(root, "..", "lessons")
-	}
-
-	entries, err := os.ReadDir(lessonsDir)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "No lessons directory at %s\n", lessonsDir)
+		fmt.Fprintf(os.Stderr, "no lessons directory at %s\n", dir)
 		os.Exit(1)
 	}
 
-	var lessons []lesson
+	orders := map[int][]string{} // order value -> files, for the sequence check
+	count := 0
 	for _, e := range entries {
 		name := e.Name()
 		if e.IsDir() || !strings.HasSuffix(name, ".md") || strings.HasPrefix(name, "_") {
 			continue
 		}
 		rel := "lessons/" + name
-		text, rerr := os.ReadFile(filepath.Join(lessonsDir, name))
-		if rerr != nil {
-			fail(rel, 0, "could not read file: "+rerr.Error())
+		text, err := os.ReadFile(filepath.Join(dir, name))
+		if err != nil {
+			fail(rel, 0, "could not read file: "+err.Error())
 			continue
 		}
-		lessons = append(lessons, lesson{rel, validate(rel, string(text))})
-	}
-
-	// Cross-file warnings.
-	checkOrderSequence(lessons)
-	checkTemplateDrift(filepath.Join(lessonsDir, "_template.md"))
-
-	// Warnings first (never block); errors decide the exit code.
-	if len(warnings) > 0 {
-		fmt.Fprintf(os.Stderr, "\nLesson WARNINGS (%d, non-blocking, please tidy):\n\n", len(warnings))
-		for _, w := range warnings {
-			fmt.Fprintln(os.Stderr, "  ! "+w.String())
+		count++
+		fields := checkLesson(rel, string(text))
+		if n, ok := positiveInt(fields["order"]); ok {
+			orders[n] = append(orders[n], rel)
 		}
 	}
-	if len(errors) > 0 {
-		fmt.Fprintf(os.Stderr, "\nLesson validation FAILED (%d problem(s)):\n\n", len(errors))
-		for _, e := range errors {
-			fmt.Fprintln(os.Stderr, "  - "+e.String())
-		}
-		fmt.Fprintln(os.Stderr, "\nSee SYNTAX.md for the rules.")
-		os.Exit(1)
-	}
-	suffix := ""
-	if len(warnings) > 0 {
-		suffix = fmt.Sprintf(" (%d warning(s) above)", len(warnings))
-	}
-	fmt.Printf("\nLesson validation passed: %d lesson(s) clean%s.\n", len(lessons), suffix)
+
+	checkOrder(orders)
+	checkTemplate(filepath.Join(dir, "_template.md"))
+	report(count)
 }
 
-// validate checks one lesson and returns its parsed frontmatter.
-func validate(file, text string) frontmatter {
-	// 4. dashes (whole file). Allow them inside `inline code` so a doc that
-	//    SHOWS the forbidden character is not flagged.
+// checkLesson validates one lesson and returns its parsed frontmatter fields.
+func checkLesson(file, text string) map[string]any {
+	// Dashes anywhere (a quiet house rule). Allow them inside `inline code` so a
+	// doc that shows the character is not itself flagged.
 	for i, line := range strings.Split(text, "\n") {
-		if dashRe.MatchString(inlineCodeRe.ReplaceAllString(line, "")) {
+		if reDash.MatchString(reCode.ReplaceAllString(line, "")) {
 			fail(file, i+1, "em/en dash is not allowed")
 		}
 	}
 
-	fm := splitFrontmatter(text)
-
-	// 1. frontmatter
-	if !fm.present {
+	fields, body, bodyLine, ok := splitFrontmatter(text)
+	if !ok {
 		fail(file, 1, "missing frontmatter (--- ... ---)")
-	} else {
-		for _, k := range requiredKeys {
-			if _, ok := fm.fields[k]; !ok {
-				fail(file, 1, fmt.Sprintf("frontmatter missing %q", k))
-			}
-		}
-		if slug, ok := fm.fields["slug"].(string); ok && slug != "" && !strings.HasPrefix(slug, "/") {
-			fail(file, 1, fmt.Sprintf("frontmatter slug %q must start with \"/\"", slug))
-		}
-		if o, ok := fm.fields["order"]; ok && !isPositiveInt(o) {
-			fail(file, 1, fmt.Sprintf("frontmatter order %v must be a positive integer", o))
-		}
-		// WARNING B: unknown frontmatter keys.
-		for _, k := range fm.keyOrder {
-			if !knownKeys[k] {
-				warn(file, 1, fmt.Sprintf("frontmatter key %q is not in the schema (typo? leftover?)", k))
-			}
-		}
-		// WARNING E: a slug that does not look like a wired route.
-		if slug, ok := fm.fields["slug"].(string); ok && slug != "" {
-			segs := nonEmpty(strings.Split(slug, "/"))
-			if !(strings.HasPrefix(slug, "/learn/") || len(segs) == 1) {
-				warn(file, 1, fmt.Sprintf(
-					"slug %q is not a \"/learn/<x>\" or top-level \"/<x>\" route; it may not be wired into the curriculum nav", slug))
-			}
-		}
+		return fields
 	}
-
-	validateBody(file, fm)
-	return fm
+	checkFrontmatter(file, fields)
+	checkBody(file, body, bodyLine)
+	return fields
 }
 
-// validateBody runs the per-line directive, HTML, and link checks over the body.
-func validateBody(file string, fm frontmatter) {
-	lines := strings.Split(fm.body(), "\n")
+func checkFrontmatter(file string, fields map[string]any) {
+	for _, k := range requiredKeys {
+		if _, ok := fields[k]; !ok {
+			fail(file, 1, fmt.Sprintf("frontmatter missing %q", k))
+		}
+	}
+	if slug, ok := fields["slug"].(string); ok && slug != "" {
+		if !strings.HasPrefix(slug, "/") {
+			fail(file, 1, fmt.Sprintf("frontmatter slug %q must start with \"/\"", slug))
+		} else if !strings.HasPrefix(slug, "/learn/") && len(nonEmpty(strings.Split(slug, "/"))) != 1 {
+			warn(file, 1, fmt.Sprintf("slug %q is not a \"/learn/<x>\" or top-level \"/<x>\" route; it may be unwired", slug))
+		}
+	}
+	if o, ok := fields["order"]; ok {
+		if _, good := positiveInt(o); !good {
+			fail(file, 1, fmt.Sprintf("frontmatter order %v must be a positive integer", o))
+		}
+	}
+	for _, k := range sortedKeys(fields) {
+		if !schemaKeys[k] {
+			warn(file, 1, fmt.Sprintf("frontmatter key %q is not in the schema (typo? leftover?)", k))
+		}
+	}
+}
 
-	inSources := false
-	sourcesLine := 0
-	sourcesHasLink := false
-	inCode := false
+// checkBody runs the directive, raw-HTML, and link checks over the lesson body.
+func checkBody(file, body string, bodyLine int) {
+	inCode, inSources, sourcesLine, sourcesHasLink := false, false, 0, false
 
-	for idx, line := range lines {
-		ln := fm.bodyStart + idx
+	for i, line := range strings.Split(body, "\n") {
+		ln := bodyLine + i
 
-		if fenceRe.MatchString(line) {
+		if reFence.MatchString(line) {
 			inCode = !inCode
 			continue
 		}
@@ -254,233 +167,188 @@ func validateBody(file string, fm frontmatter) {
 			continue
 		}
 
-		// 2. block directives (:::name)
-		if m := containerRe.FindStringSubmatch(line); m != nil {
-			name := m[1]
-			if !blockDirectives[name] {
-				if leafDirectives[name] {
-					fail(file, ln, fmt.Sprintf("%q is not a block (:::) directive", name))
-				} else {
-					fail(file, ln, fmt.Sprintf("unknown directive \":::%s\" (not whitelisted)", name))
-				}
+		// Block directives (:::name), plus :::sources bookkeeping.
+		if m := reBlock.FindStringSubmatch(line); m != nil {
+			checkDirective(file, ln, ":::", m[1], blockDirectives, leafDirectives)
+			if m[1] == "sources" {
+				inSources, sourcesLine, sourcesHasLink = true, ln, false
 			}
-			if name == "sources" {
-				inSources = true
-				sourcesLine = ln
-				sourcesHasLink = false
-			}
-		} else if containerEnd.MatchString(line) {
-			// WARNING C: a :::sources block that closed without a link.
+		} else if reBlockEnd.MatchString(line) {
 			if inSources && !sourcesHasLink {
 				warn(file, sourcesLine, "empty :::sources block (no links inside)")
 			}
 			inSources = false
 		}
 
-		// 2/5. leaf directives (::name{...})
-		if m := leafRe.FindStringSubmatch(line); m != nil {
-			name := m[1]
-			if !leafDirectives[name] {
-				if blockDirectives[name] {
-					fail(file, ln, fmt.Sprintf("%q is not a leaf (::) directive", name))
-				} else {
-					fail(file, ln, fmt.Sprintf("unknown directive \"::%s\" (not whitelisted)", name))
-				}
-			}
-			if name == "art" {
-				idm := artIDRe.FindStringSubmatch(m[2])
-				if idm == nil {
+		// Leaf directives (::name{...}), including the ::art id check.
+		if m := reLeaf.FindStringSubmatch(line); m != nil {
+			checkDirective(file, ln, "::", m[1], leafDirectives, blockDirectives)
+			if m[1] == "art" {
+				if id := reArtID.FindStringSubmatch(m[2]); id == nil {
 					fail(file, ln, "::art is missing an id")
-				} else if !idRe.MatchString(idm[1]) {
-					fail(file, ln, fmt.Sprintf("::art id %q must match ^[a-z0-9][a-z0-9-]*$", idm[1]))
+				} else if !reID.MatchString(id[1]) {
+					fail(file, ln, fmt.Sprintf("::art id %q must match ^[a-z0-9][a-z0-9-]*$", id[1]))
 				}
 			}
 		}
 
-		// 3. raw HTML tags (allow directive lines + the template's HTML comment)
-		stripped := inlineCodeRe.ReplaceAllString(line, "")
-		if htmlTagRe.MatchString(stripped) && !commentRe.MatchString(line) {
-			fail(file, ln, "raw HTML tag is not allowed (use Markdown / directives)")
+		// Raw HTML (allow directive lines and the template's HTML comment).
+		if reHTML.MatchString(reCode.ReplaceAllString(line, "")) && !reComment.MatchString(line) {
+			fail(file, ln, "raw HTML tag is not allowed (use Markdown or a utility)")
 		}
 
-		// 6. links
-		for _, lm := range linkRe.FindAllStringSubmatch(line, -1) {
-			href := lm[1]
+		// Links: body prose internal only; external https only inside :::sources.
+		for _, lm := range reLink.FindAllStringSubmatch(line, -1) {
 			if inSources {
 				sourcesHasLink = true
 			}
-			kind := classifyLink(href)
+			kind, reject := classifyLink(lm[1])
 			switch {
-			case strings.HasPrefix(kind, "reject:"):
-				fail(file, ln, fmt.Sprintf("%s (%s)", strings.TrimPrefix(kind, "reject:"), href))
+			case reject != "":
+				fail(file, ln, fmt.Sprintf("%s (%s)", reject, lm[1]))
 			case kind == "external" && !inSources:
-				fail(file, ln, fmt.Sprintf("external link %q is only allowed inside :::sources", href))
+				fail(file, ln, fmt.Sprintf("external link %q is only allowed inside :::sources", lm[1]))
 			}
 		}
 	}
-
-	// a :::sources block left open at EOF still gets the empty check.
 	if inSources && !sourcesHasLink {
 		warn(file, sourcesLine, "empty :::sources block (no links inside)")
 	}
 }
 
-// classifyLink returns "internal", "external", or "reject:<reason>".
-func classifyLink(raw string) string {
+// checkDirective fails if name is not in allowed: it explains a block/leaf mixup
+// (name belongs to other) or that the directive is simply unknown.
+func checkDirective(file string, ln int, marker, name string, allowed, other map[string]bool) {
+	switch {
+	case allowed[name]:
+		return
+	case other[name]:
+		fail(file, ln, fmt.Sprintf("%q is not a %s directive", name, marker))
+	default:
+		fail(file, ln, fmt.Sprintf("unknown directive %q (not whitelisted)", marker+name))
+	}
+}
+
+// classifyLink returns ("internal"|"external", "") for an allowed link, or
+// ("", reason) for a rejected one.
+func classifyLink(raw string) (kind, reject string) {
 	u := strings.TrimSpace(raw)
-	if u == "" {
-		return "reject:empty link"
+	switch {
+	case u == "":
+		return "", "empty link"
+	case strings.HasPrefix(u, "#"), strings.HasPrefix(u, "/"),
+		strings.HasPrefix(u, "./"), strings.HasPrefix(u, "../"), strings.HasPrefix(u, "mailto:"):
+		return "internal", ""
 	}
-	if strings.HasPrefix(u, "#") || strings.HasPrefix(u, "/") ||
-		strings.HasPrefix(u, "./") || strings.HasPrefix(u, "../") {
-		return "internal"
+	scheme, _, hasScheme := strings.Cut(u, ":")
+	if !hasScheme || strings.ContainsAny(scheme, "/.") {
+		return "external", "" // a bare host like example.com/x
 	}
-	if strings.HasPrefix(u, "mailto:") {
-		return "internal"
-	}
-	if m := schemeRe.FindStringSubmatch(u); m != nil {
-		switch scheme := strings.ToLower(m[1]); scheme {
-		case "https":
-			parsed, err := url.Parse(u)
-			if err != nil {
-				return "reject:malformed https URL"
-			}
-			if internalHosts[strings.ToLower(parsed.Hostname())] {
-				return "internal"
-			}
-			return "external"
-		case "http":
-			return "reject:http is not allowed (use https)"
-		default:
-			return fmt.Sprintf("reject:protocol %q is not allowed", scheme+":")
+	switch strings.ToLower(scheme) {
+	case "https":
+		p, err := url.Parse(u)
+		if err != nil {
+			return "", "malformed https URL"
 		}
+		if internalHosts[strings.ToLower(p.Hostname())] {
+			return "internal", ""
+		}
+		return "external", ""
+	case "http":
+		return "", "http is not allowed (use https)"
+	default:
+		return "", fmt.Sprintf("protocol %q is not allowed", scheme+":")
 	}
-	// bare host like "example.com/x": external (rejected in body prose).
-	return "external"
 }
 
-// splitFrontmatter pulls the leading --- ... --- YAML block. It records the
-// ordered key list (for unknown-key warnings) and where the body starts.
-func splitFrontmatter(text string) frontmatter {
-	fm := frontmatter{fields: map[string]any{}, bodyStart: 1, src: text}
-	loc := regexp.MustCompile(`(?s)^---\n(.*?)\n---\n?`).FindStringSubmatchIndex(text)
+// splitFrontmatter returns the YAML frontmatter fields, the body text, the
+// 1-based line the body starts on, and whether frontmatter was present.
+func splitFrontmatter(text string) (fields map[string]any, body string, bodyLine int, ok bool) {
+	loc := reFront.FindStringSubmatchIndex(text)
 	if loc == nil {
-		return fm
+		return map[string]any{}, text, 1, false
 	}
-	fm.present = true
-	raw := text[loc[2]:loc[3]]
-	fm.bodyOffset = loc[1]
-	fm.bodyStart = strings.Count(text[:loc[1]], "\n") + 1
-
-	// Parse with YAML for correct typing (numbers, quoted strings).
-	var doc map[string]any
-	if err := yaml.Unmarshal([]byte(raw), &doc); err == nil && doc != nil {
-		fm.fields = doc
-	}
-	// Capture key order from the raw text (YAML maps are unordered).
-	for _, line := range strings.Split(raw, "\n") {
-		t := strings.TrimSpace(line)
-		if t == "" || strings.HasPrefix(t, "#") {
-			continue
-		}
-		i := strings.Index(t, ":")
-		if i < 0 {
-			continue
-		}
-		key := strings.TrimSpace(t[:i])
-		if key == "" {
-			continue
-		}
-		fm.keyOrder = append(fm.keyOrder, key)
-		if _, ok := fm.fields[key]; !ok {
-			fm.fields[key] = strings.TrimSpace(t[i+1:])
-		}
-	}
-	return fm
+	fields = map[string]any{}
+	_ = yaml.Unmarshal([]byte(text[loc[2]:loc[3]]), &fields)
+	body = text[loc[1]:]
+	bodyLine = strings.Count(text[:loc[1]], "\n") + 1
+	return fields, body, bodyLine, true
 }
 
-// checkTemplateDrift warns if the disabled starter has drifted from the schema.
-func checkTemplateDrift(templatePath string) {
-	data, err := os.ReadFile(templatePath)
+// checkTemplate warns if the disabled starter is missing or has drifted.
+func checkTemplate(path string) {
+	data, err := os.ReadFile(path)
 	if err != nil {
 		warn("lessons/_template.md", 0, "missing: contributors have no starter to copy")
 		return
 	}
-	fm := splitFrontmatter(string(data))
-	if !fm.present {
+	fields, _, _, ok := splitFrontmatter(string(data))
+	if !ok {
 		warn("lessons/_template.md", 1, "template has no frontmatter to copy from")
 		return
 	}
 	for _, k := range requiredKeys {
-		if _, ok := fm.fields[k]; !ok {
+		if _, ok := fields[k]; !ok {
 			warn("lessons/_template.md", 1, fmt.Sprintf("template is missing required key %q (schema drift)", k))
 		}
 	}
-	for _, k := range fm.keyOrder {
-		if !knownKeys[k] {
+	for _, k := range sortedKeys(fields) {
+		if !schemaKeys[k] {
 			warn("lessons/_template.md", 1, fmt.Sprintf("template carries unknown key %q (schema drift)", k))
 		}
 	}
 }
 
-// checkOrderSequence warns if the curriculum `order` is not 1..N without gaps
-// or duplicates. A gap usually means a removed (dangling) or unwired lesson; a
-// duplicate means two lessons fight for the same slot.
-func checkOrderSequence(lessons []lesson) {
-	seen := map[int][]string{}
-	for _, l := range lessons {
-		o, ok := orderInt(l.fm.fields["order"])
-		if !ok {
-			continue
-		}
-		seen[o] = append(seen[o], l.file)
-	}
-	if len(seen) == 0 {
+// checkOrder warns when the curriculum `order` values are not 1..N without gaps
+// or duplicates. A gap is usually a removed or unwired lesson; a duplicate means
+// two lessons claim the same slot.
+func checkOrder(orders map[int][]string) {
+	if len(orders) == 0 {
 		return
 	}
-	orders := make([]int, 0, len(seen))
-	for o := range seen {
-		orders = append(orders, o)
-	}
-	sort.Ints(orders)
-
-	for _, o := range orders {
-		if len(seen[o]) > 1 {
-			warn("", 0, fmt.Sprintf("duplicate order %d used by: %s", o, strings.Join(seen[o], ", ")))
+	nums := make([]int, 0, len(orders))
+	for n, files := range orders {
+		nums = append(nums, n)
+		if len(files) > 1 {
+			warn("", 0, fmt.Sprintf("duplicate order %d used by: %s", n, strings.Join(files, ", ")))
 		}
 	}
-
-	min, max := orders[0], orders[len(orders)-1]
-	if min != 1 {
-		warn("", 0, fmt.Sprintf("lesson order starts at %d, not 1 (a lesson may be missing from the front)", min))
+	sort.Ints(nums)
+	if nums[0] != 1 {
+		warn("", 0, fmt.Sprintf("lesson order starts at %d, not 1", nums[0]))
 	}
-	// Collapse runs of missing numbers into a single range warning.
-	runStart := -1
-	flush := func(end int) {
-		if runStart < 0 {
-			return
-		}
-		if runStart == end {
-			warn("", 0, fmt.Sprintf("lesson order has a gap at %d (missing / unwired lesson between neighbors)", runStart))
-		} else {
-			warn("", 0, fmt.Sprintf("lesson order has a gap at %d-%d (missing / unwired lessons; a far-off order can mean an unwired lesson)", runStart, end))
-		}
-		runStart = -1
-	}
-	for i := min; i <= max; i++ {
-		if len(seen[i]) == 0 {
-			if runStart < 0 {
-				runStart = i
-			}
-		} else {
-			flush(i - 1)
+	for n := nums[0]; n < nums[len(nums)-1]; n++ {
+		if len(orders[n]) == 0 {
+			warn("", 0, fmt.Sprintf("lesson order has a gap at %d (missing or unwired lesson)", n))
 		}
 	}
-	flush(max)
 }
 
-// orderInt coerces a frontmatter `order` value to a positive int.
-func orderInt(v any) (int, bool) {
+func report(count int) {
+	if len(warnings) > 0 {
+		fmt.Fprintf(os.Stderr, "\nWarnings (%d, non-blocking, please tidy):\n", len(warnings))
+		for _, w := range warnings {
+			fmt.Fprintln(os.Stderr, "  ! "+w)
+		}
+	}
+	if len(errors) > 0 {
+		fmt.Fprintf(os.Stderr, "\nValidation FAILED (%d problem(s)):\n", len(errors))
+		for _, e := range errors {
+			fmt.Fprintln(os.Stderr, "  - "+e)
+		}
+		fmt.Fprintln(os.Stderr, "\nSee SYNTAX.md for the rules.")
+		os.Exit(1)
+	}
+	extra := ""
+	if len(warnings) > 0 {
+		extra = fmt.Sprintf(" (%d warning(s) above)", len(warnings))
+	}
+	fmt.Printf("\nValidation passed: %d lesson(s) clean%s.\n", count, extra)
+}
+
+// positiveInt coerces a frontmatter value (a YAML int or a quoted string) to a
+// positive int.
+func positiveInt(v any) (int, bool) {
 	switch n := v.(type) {
 	case int:
 		return n, n > 0
@@ -489,21 +357,23 @@ func orderInt(v any) (int, bool) {
 	case float64:
 		return int(n), n == float64(int64(n)) && n > 0
 	case string:
-		if intDigitsRe.MatchString(n) {
-			x := 0
-			fmt.Sscanf(n, "%d", &x)
+		var x int
+		if _, err := fmt.Sscanf(n, "%d", &x); err == nil {
 			return x, x > 0
 		}
 	}
 	return 0, false
 }
 
-func isPositiveInt(v any) bool {
-	_, ok := orderInt(v)
-	return ok
+func sortedKeys(m map[string]any) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
-// nonEmpty drops empty segments.
 func nonEmpty(in []string) []string {
 	out := in[:0]
 	for _, s := range in {
