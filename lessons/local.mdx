@@ -8,12 +8,12 @@ order: 12
 import LessonArt from "../../../components/LessonArt.astro";
 import DrBeakman from "../../../components/DrBeakman.astro";
 
-const ollamaSnippet = `# pull a bird and ask it the only question that matters:
+export const ollamaSnippet = `# pull a bird and ask it the only question that matters:
 ollama run llama4:scout "Generate an SVG of a pelican riding a bicycle"
 # (swap llama4:scout for whatever bird is trending this week)
 # try qwen3:8b for a compact chaos factory`;
 
-const mlxSnippet = `pip install mlx-lm
+export const mlxSnippet = `pip install mlx-lm
 mlx_lm.generate --model mlx-community/Qwen3-8B-4bit \\
   --prompt "Generate an SVG of a pelican riding a bicycle"`;
 
@@ -114,9 +114,7 @@ mlx_lm.generate --model mlx-community/Qwen3-8B-4bit \\
       On Apple Silicon, <b>MLX</b> (
       <a href="https://github.com/ml-explore/mlx" target="_blank" rel="noreferrer" class="text-blue-700 underline">ml-explore/mlx</a>)
       is Apple&apos;s ML framework tuned for unified memory. The{" "}
-      <a href="https://huggingface.co/mlx-community" target="_blank" rel="noreferrer" class="text-blue-700 underline">
-        mlx-community
-      </a>{" "}
+      <a href="https://huggingface.co/mlx-community" target="_blank" rel="noreferrer" class="text-blue-700 underline">mlx-community</a>{" "}
       keeps a large aviary of pre-converted birds. Often the fastest perch on a Mac:
     </p>
     <pre class="mt-2 overflow-x-auto whitespace-pre-wrap break-words rounded bg-black p-3 text-xs text-lime-400">{mlxSnippet}</pre>
@@ -252,9 +250,7 @@ mlx_lm.generate --model mlx-community/Qwen3-8B-4bit \\
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            &ldquo;[1hr Talk] Intro to Large Language Models&rdquo;
-          </a>{" "}
+          >&ldquo;[1hr Talk] Intro to Large Language Models&rdquo;</a>{" "}
           two-files framing, zip-of-the-internet analogy, open vs. closed breakdown
         </li>
         <li>
@@ -263,9 +259,7 @@ mlx_lm.generate --model mlx-community/Qwen3-8B-4bit \\
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            Ollama (ollama.com)
-          </a>{" "}
+          >Ollama (ollama.com)</a>{" "}
           the easiest way to run open models locally
         </li>
         <li>
@@ -274,9 +268,7 @@ mlx_lm.generate --model mlx-community/Qwen3-8B-4bit \\
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            LM Studio (lmstudio.ai)
-          </a>{" "}
+          >LM Studio (lmstudio.ai)</a>{" "}
           desktop GUI for browsing and running local models
         </li>
         <li>
@@ -285,9 +277,7 @@ mlx_lm.generate --model mlx-community/Qwen3-8B-4bit \\
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            Apple MLX (ml-explore/mlx on GitHub)
-          </a>{" "}
+          >Apple MLX (ml-explore/mlx on GitHub)</a>{" "}
           Apple&apos;s ML framework tuned for Apple Silicon
         </li>
         <li>
@@ -296,9 +286,7 @@ mlx_lm.generate --model mlx-community/Qwen3-8B-4bit \\
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            Hugging Face Models Hub
-          </a>{" "}
+          >Hugging Face Models Hub</a>{" "}
           2.9 million models, the world&apos;s open-weights aviary
         </li>
       </ul>

@@ -6,7 +6,7 @@ Astro content collection.
 
 ## Layout
 
-- `lessons/*.mdx` — Pelican Ground School lessons. Each file carries frontmatter
+- `lessons/*.mdx`: Pelican Ground School lessons. Each file carries frontmatter
   (`slug`, `nav`, `blurb`, `teaches`, `order`) and a body in the comedy-pelican
   voice. Bodies use the `<DrBeakman>` and `<LessonArt>` components (imported from
   the site) and reference illustration ids that live in the main repo's

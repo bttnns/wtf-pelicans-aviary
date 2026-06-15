@@ -9,7 +9,7 @@ import LessonArt from "../../../components/LessonArt.astro";
 import DrBeakman from "../../../components/DrBeakman.astro";
 
 
-<style>
+<style>{`
   /* === BUBBLE PANIC STYLES === */
 
   /* Red alert banner */
@@ -156,14 +156,14 @@ import DrBeakman from "../../../components/DrBeakman.astro";
     .bubble-shake { animation: none; }
     .bubble-meter-fill { animation: none; }
   }
-</style>
+`}</style>
 
   <div
     class="mt-4 text-left text-[15px] leading-relaxed text-gray-800"
     style={{ fontFamily: "'Times New Roman', Times, serif" }}
   >
 
-    <!-- RED ALERT BANNER -->
+    {/* RED ALERT BANNER */}
     <div class="bubble-alert mb-5">
       <div class="bubble-alert-inner">
         <span class="bubble-siren">🚨</span>{" "}
@@ -180,9 +180,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
       Full disclosure on my qualifications: I was a software engineer. Then the
       company decided large language models could do a version of my job. I now
       run a pelican website funded by a{" "}
-      <a href="/pouch" class="text-blue-700 underline">
-        tip jar
-      </a>{" "}
+      <a href="/pouch" class="text-blue-700 underline">tip jar</a>{" "}
       I called my "Series A" as a joke, except it is my only income so the joke
       has lost some of its punch. My perspective on the AI economy is, shall we
       say, <i>grounded</i>, in the sense that I am on the ground, professionally speaking,
@@ -202,7 +200,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
       small country&apos;s GDP.
     </DrBeakman>
 
-    <!-- WE ARE SO COOKED METER -->
+    {/* WE ARE SO COOKED METER */}
     <div class="my-5">
       <p class="mb-1 font-mono text-xs font-bold uppercase tracking-widest text-red-700">
         current "we are so cooked" reading:
@@ -334,9 +332,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
       the increase. AI-focused data centers surged 50% in 2025 alone. Servers
       generate heat; heat requires cooling; cooling requires water, sometimes
       staggering amounts, in areas where water is not a surplus commodity. The{" "}
-      <a href="/" class="text-blue-700 underline">
-        homepage
-      </a>{" "}
+      <a href="/" class="text-blue-700 underline">homepage</a>{" "}
       shows the true cost of the cursed pelicans: tokens, watt-hours, water,
       grounded in real conversion math. Every pelican SVG is an accurate receipt
       from the physical world. A <b>real</b> receipt. For <b>real</b> water and{" "}
@@ -344,7 +340,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
       but the receipt is not.
     </p>
 
-    <!-- COOKED METER 2: THE PLANET -->
+    {/* COOKED METER 2: THE PLANET */}
     <div class="my-4">
       <p class="mb-1 font-mono text-xs font-bold uppercase tracking-widest text-red-700">
         aquifer status:
@@ -412,9 +408,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
       It is also drawing pelicans on bicycles. Hundreds of them. Because one
       person ran a slightly absurd benchmark and another person (me, the
       displaced software engineer) made it into a museum, funded by a{" "}
-      <a href="/pouch" class="text-blue-700 underline">
-        tip jar called the Tip Pouch
-      </a>
+      <a href="/pouch" class="text-blue-700 underline">tip jar called the Tip Pouch</a>
       , which I have described to my parents as my "Series A," which is a
       reference to venture capital funding rounds, which is itself a layer of
       the same bubble. The pelicans are real. The watts are real. The leases are
@@ -428,7 +422,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
       that is not vibes, that is the bubble.
     </DrBeakman>
 
-    <!-- FINAL ALARM -->
+    {/* FINAL ALARM */}
     <div class="bubble-alert my-5">
       <div class="bubble-alert-inner">
         <span class="bubble-siren">🔥🔥🔥</span>{" "}
@@ -455,9 +449,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            Goldman Sachs, &ldquo;Tracking Trillions: The Assumptions Shaping the Scale of the AI Build-Out&rdquo;
-          </a>{" "}
+          >Goldman Sachs, &ldquo;Tracking Trillions: The Assumptions Shaping the Scale of the AI Build-Out&rdquo;</a>{" "}
           the baseline model behind the $765B/year 2026 figure
         </li>
         <li>
@@ -466,9 +458,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            Dell&apos;Oro Group, AI boom drives data center capex through 2030
-          </a>{" "}
+          >Dell&apos;Oro Group, AI boom drives data center capex through 2030</a>{" "}
           the $5.2 trillion cumulative projection
         </li>
         <li>
@@ -477,9 +467,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            Goldman Sachs, &ldquo;Gen AI: Too Much Spend, Too Little Benefit?&rdquo; (2024)
-          </a>{" "}
+          >Goldman Sachs, &ldquo;Gen AI: Too Much Spend, Too Little Benefit?&rdquo; (2024)</a>{" "}
           Acemoglu and Covello ask if the returns will ever arrive
         </li>
         <li>
@@ -488,9 +476,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            IEA, &ldquo;Energy and AI&rdquo; (2025)
-          </a>{" "}
+          >IEA, &ldquo;Energy and AI&rdquo; (2025)</a>{" "}
           data center electricity demand set to double by 2030
         </li>
         <li>
@@ -499,9 +485,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            David Cahn (Sequoia), &ldquo;AI&apos;s $600B Question&rdquo; (2024)
-          </a>{" "}
+          >David Cahn (Sequoia), &ldquo;AI&apos;s $600B Question&rdquo; (2024)</a>{" "}
           where is the revenue to justify the GPU spend?
         </li>
         <li>
@@ -510,9 +494,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            Moody&apos;s Ratings, &ldquo;$662B in off-balance-sheet data-center lease commitments&rdquo; (2026)
-          </a>{" "}
+          >Moody&apos;s Ratings, &ldquo;$662B in off-balance-sheet data-center lease commitments&rdquo; (2026)</a>{" "}
           the hyperscaler leases not yet on the books
         </li>
         <li>
@@ -521,9 +503,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
             target="_blank"
             rel="noreferrer"
             class="text-blue-700 underline"
-          >
-            CNBC, &ldquo;AI spending approaches $700 billion in 2026, cash taking big hit&rdquo;
-          </a>{" "}
+          >CNBC, &ldquo;AI spending approaches $700 billion in 2026, cash taking big hit&rdquo;</a>{" "}
           the source for Amazon&apos;s free cash flow turning negative
         </li>
       </ul>

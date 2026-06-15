@@ -7,40 +7,7 @@ order: 8
 ---
 import LessonArt from "../../../components/LessonArt.astro";
 import DrBeakman from "../../../components/DrBeakman.astro";
-import { PromptCopy } from "../../../islands/Notepad";
-import { PROMPTS as BENCH_PROMPTS, DESCRIBE_PROMPT, POUCH_PROMPT, TIP_SCREEN_PROMPT } from "../../../data";
-
-const benchWindows = Object.entries(BENCH_PROMPTS).map(([version, text], i) => ({
-  file: `benchmark_${version.replace(/-/g, "_")}.txt`,
-  label: `the benchmark prompt (${version}): sent verbatim, sole user message, no system prompt, no sampling params`,
-  text,
-  link: i === 0 ? { href: "/", text: "see all 30+ victims »" } : null,
-}));
-
-const PROMPTS = [
-  ...benchWindows,
-  {
-    file: "artists_statement.txt",
-    label: "the artist's-statement prompt: second (vision) call, the model is shown its own drawing",
-    text: DESCRIBE_PROMPT,
-    link: null,
-  },
-  {
-    file: "tip_pouch.txt",
-    label: "the tip pouch prompt: an AI wrote it, then an AI drew the pouch from it",
-    text: POUCH_PROMPT,
-    link: { href: "/pouch", text: "see the pouch »" },
-  },
-  {
-    file: "tip_screen.txt",
-    label:
-      "the tip screen prompt: we asked Claude Opus 4.8 (high) on claude.ai for an IMAGE, not an SVG. it drew an SVG anyway",
-    text: TIP_SCREEN_PROMPT,
-    link: { href: "/pouch", text: "see the bird »" },
-  },
-];
-
-const win95 = "Tahoma, 'MS Sans Serif', Geneva, sans-serif";
+import PromptWindows from "../../../components/PromptWindows.astro";
 
 
   <div
@@ -86,70 +53,7 @@ const win95 = "Tahoma, 'MS Sans Serif', Geneva, sans-serif";
       competitive advantage left to protect. These are the exact strings this
       website sends. Nothing more.
     </p>
-    {
-      PROMPTS.map((p) => (
-        <div
-          class="mt-4"
-          style={{
-            background: "#c0c0c0",
-            border: "2px solid",
-            borderColor: "#ffffff #808080 #808080 #ffffff",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              background: "#000080",
-              color: "#fff",
-              padding: "2px 3px 2px 6px",
-              fontSize: "11px",
-              fontWeight: 700,
-              fontFamily: win95,
-            }}
-          >
-            <span>📝 NotepadAI - {p.file}</span>
-            <span
-              aria-hidden="true"
-              style={{
-                display: "flex",
-                width: 16,
-                height: 14,
-                alignItems: "center",
-                justifyContent: "center",
-                background: "#c0c0c0",
-                color: "#000",
-                border: "1px solid",
-                borderColor: "#ffffff #808080 #808080 #ffffff",
-                fontSize: 10,
-                lineHeight: 1,
-              }}
-            >
-              ×
-            </span>
-          </div>
-          <p
-            style={{
-              margin: "6px 8px 0",
-              fontSize: "12px",
-              fontWeight: 700,
-              color: "#3b0764",
-              fontFamily: win95,
-            }}
-          >
-            {p.label}
-            {p.link && (
-              <>
-                {" "}
-                <a href={p.link.href}>{p.link.text}</a>
-              </>
-            )}
-          </p>
-          <PromptCopy client:visible text={p.text} />
-        </div>
-      ))
-    }
+    <PromptWindows />
 
     <h2 class="wtf-title mt-7 mb-2 text-2xl text-purple-900">first, context</h2>
     <p>
@@ -336,9 +240,7 @@ const win95 = "Tahoma, 'MS Sans Serif', Geneva, sans-serif";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          &ldquo;Deep Dive into LLMs like ChatGPT&rdquo;
-        </a>{" "}
+        >&ldquo;Deep Dive into LLMs like ChatGPT&rdquo;</a>{" "}
         (context windows and prompting sections sourced directly here)
       </li>
       <li>
@@ -348,9 +250,7 @@ const win95 = "Tahoma, 'MS Sans Serif', Geneva, sans-serif";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          &ldquo;Prompt engineering overview&rdquo;
-        </a>{" "}
+        >&ldquo;Prompt engineering overview&rdquo;</a>{" "}
         (clarity, few-shot examples, chain of thought, XML structure)
       </li>
       <li>
@@ -360,9 +260,7 @@ const win95 = "Tahoma, 'MS Sans Serif', Geneva, sans-serif";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          &ldquo;Prompt engineering&rdquo;
-        </a>{" "}
+        >&ldquo;Prompt engineering&rdquo;</a>{" "}
         (six strategies; reasoning models, few-shot patterns)
       </li>
       <li>
@@ -372,9 +270,7 @@ const win95 = "Tahoma, 'MS Sans Serif', Geneva, sans-serif";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          &ldquo;Context engineering&rdquo;
-        </a>{" "}
+        >&ldquo;Context engineering&rdquo;</a>{" "}
         (why the rename mattered)
       </li>
       <li>
@@ -384,9 +280,7 @@ const win95 = "Tahoma, 'MS Sans Serif', Geneva, sans-serif";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          &ldquo;Language Models are Few-Shot Learners&rdquo; (GPT-3)
-        </a>{" "}
+        >&ldquo;Language Models are Few-Shot Learners&rdquo; (GPT-3)</a>{" "}
         (the result that made in-context examples, the heart of prompting, actually work)
       </li>
     </ul>

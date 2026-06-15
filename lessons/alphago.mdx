@@ -9,7 +9,7 @@ import LessonArt from "../../../components/LessonArt.astro";
 import DrBeakman from "../../../components/DrBeakman.astro";
 
 
-<style>
+<style>{`
   /* === GO BOARD STYLES === */
 
   /* A little 9x9 goban motif used as a section divider. Static, no animation. */
@@ -107,7 +107,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
   :global([data-theme="dark"]) .go-year {
     color: #c4a3ff;
   }
-</style>
+`}</style>
 
   <div
     class="mt-4 text-left text-[15px] leading-relaxed text-gray-800"
@@ -476,9 +476,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          Silver et al., &ldquo;Mastering the game of Go with deep neural networks and tree search&rdquo;
-        </a>{" "}
+        >Silver et al., &ldquo;Mastering the game of Go with deep neural networks and tree search&rdquo;</a>{" "}
         (<i>Nature</i>, 2016): the original AlphaGo paper, neural nets + Monte Carlo tree search
       </li>
       <li>
@@ -487,9 +485,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          Silver et al., &ldquo;Mastering the game of Go without human knowledge&rdquo;
-        </a>{" "}
+        >Silver et al., &ldquo;Mastering the game of Go without human knowledge&rdquo;</a>{" "}
         (<i>Nature</i>, 2017): AlphaGo Zero, learned from self-play alone, 100-0 over the Lee Sedol version
       </li>
       <li>
@@ -498,9 +494,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          Wikipedia, &ldquo;AlphaGo versus Lee Sedol&rdquo;
-        </a>{" "}
+        >Wikipedia, &ldquo;AlphaGo versus Lee Sedol&rdquo;</a>{" "}
         the Seoul match, the 4-1 result, Move 37, and Lee&apos;s Game 4 Move 78
       </li>
       <li>
@@ -509,9 +503,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          &ldquo;AlphaGo - The Movie&rdquo; (2017, dir. Greg Kohs)
-        </a>{" "}
+        >&ldquo;AlphaGo - The Movie&rdquo; (2017, dir. Greg Kohs)</a>{" "}
         the full documentary, free on YouTube from DeepMind
       </li>
       <li>
@@ -520,9 +512,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          Wikipedia, &ldquo;Deep Blue versus Garry Kasparov&rdquo;
-        </a>{" "}
+        >Wikipedia, &ldquo;Deep Blue versus Garry Kasparov&rdquo;</a>{" "}
         the 1997 chess match, the brute-force era
       </li>
       <li>
@@ -532,9 +522,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          &ldquo;ImageNet Classification with Deep Convolutional Neural Networks&rdquo;
-        </a>{" "}
+        >&ldquo;ImageNet Classification with Deep Convolutional Neural Networks&rdquo;</a>{" "}
         (2012): AlexNet, the spark of the deep learning revolution
       </li>
       <li>
@@ -544,9 +532,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          &ldquo;Attention Is All You Need&rdquo;
-        </a>{" "}
+        >&ldquo;Attention Is All You Need&rdquo;</a>{" "}
         (2017): the Transformer, the T in GPT, the ancestor of every bird on this site
       </li>
       <li>
@@ -555,9 +541,7 @@ import DrBeakman from "../../../components/DrBeakman.astro";
           target="_blank"
           rel="noreferrer"
           class="text-blue-700 underline"
-        >
-          BBC, &ldquo;Go master quits because AI &lsquo;cannot be defeated&rsquo;&rdquo;
-        </a>{" "}
+        >BBC, &ldquo;Go master quits because AI &lsquo;cannot be defeated&rsquo;&rdquo;</a>{" "}
         (2019): Lee Sedol&apos;s retirement
       </li>
     </ul>
