@@ -1,0 +1,17 @@
+# Keep the lesson validator's dependencies and the CI actions current. The only
+# code in this repo is the small Go validator (validate/) and the GitHub Action
+# that runs it, so we watch just those two ecosystems, weekly.
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"

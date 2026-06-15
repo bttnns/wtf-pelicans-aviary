@@ -1,0 +1,3 @@
+# Go build output from the lesson validator (we run it with `go run`, never commit a binary).
+/validate/validate
+/validate/validate.exe

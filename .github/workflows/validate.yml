@@ -9,7 +9,9 @@ on:
   pull_request:
     paths:
       - "lessons/**"
-      - "scripts/validate-lessons.mjs"
+      - "validate/**"
+      - "go.mod"
+      - "go.sum"
       - ".github/workflows/validate.yml"
   push:
     branches: [main]
@@ -19,12 +21,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-go@v5
         with:
-          node-version: "24"
-      # Zero-dependency validator: no npm install needed. It prints non-blocking
-      # WARNINGS (order gaps/dupes, unknown frontmatter keys, empty :::sources,
-      # template drift, unwired slugs) to the log, and only exits non-zero on a
-      # hard rule violation, so leftovers surface without failing the PR.
+          go-version: "1.23"
+          cache-dependency-path: go.sum
+      # A small, fast Go program (one tiny YAML dependency, no network). It
+      # prints non-blocking WARNINGS (order gaps/dupes, unknown frontmatter
+      # keys, empty :::sources, template drift, unwired slugs) to the log, and
+      # only exits non-zero on a hard rule violation, so leftovers surface
+      # without failing the PR. Same command you can run locally.
       - name: Validate lessons
-        run: node scripts/validate-lessons.mjs
+        run: go run ./validate
